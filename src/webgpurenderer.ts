@@ -4,8 +4,8 @@
 import { mat4 } from 'gl-matrix';
 import { createBuffer } from './webgpuhelpers';
 import Camera from './camera';
-import Triangle from './triangle';
 import WebGPURenderContext from './webgpurendercontext';
+import WebGPUMesh from './webgpumesh';
 export default class WebGPURenderer {
   private canvas: HTMLCanvasElement;
   private adapter: GPUAdapter;
@@ -15,7 +15,7 @@ export default class WebGPURenderer {
 
   private uniformBuffer: GPUBuffer;
 
-  private triangle: Triangle;
+  private meshes: WebGPUMesh[] = [];
 
   // shader modules
   private vertexModule: GPUShaderModule;
@@ -54,7 +54,7 @@ export default class WebGPURenderer {
 
   private updateUniformBuffer(camera: Camera): void {
     const uboArray = new Float32Array([
-      ...this.triangle.modelMatrix,
+      ...this.meshes[0].modelMatrix,
       ...camera.viewMatrix,
       ...camera.perspectiveMatrix,
     ]);
@@ -123,6 +123,8 @@ export default class WebGPURenderer {
       depthStencilAttachment: depthAttachment,
     };
 
+    const geometry = this.meshes[0].geometry;
+
     this.commandEncoder = this.device.createCommandEncoder();
 
     this.passEncoder = this.commandEncoder.beginRenderPass(renderPassDesc);
@@ -130,20 +132,25 @@ export default class WebGPURenderer {
     this.passEncoder.setBindGroup(0, this.uniformBindGroup);
     this.passEncoder.setViewport(0, 0, this.canvas.width, this.canvas.height, 0, 1);
     this.passEncoder.setScissorRect(0, 0, this.canvas.width, this.canvas.height);
-    this.passEncoder.setVertexBuffer(0, this.triangle.vertexBuffer);
-    this.passEncoder.setIndexBuffer(this.triangle.indexBuffer);
-    this.passEncoder.drawIndexed(3, 1, 0, 0, 0);
+    for (let i = 0; i < geometry.vertexBuffers.length; i++) {
+      this.passEncoder.setVertexBuffer(i, geometry.vertexBuffers[i]);
+    }
+    if (geometry.indexCount > 0) {
+      this.passEncoder.setIndexBuffer(geometry.indexBuffer);
+      this.passEncoder.drawIndexed(geometry.indexCount, 1, 0, 0, 0);
+    } else {
+      this.passEncoder.draw(geometry.vertexCount, 1, 0, 0);
+    }
     this.passEncoder.endPass();
 
     this.queue.submit([this.commandEncoder.finish()]);
   }
 
   private async initializeResources(): Promise<void> {
-    this.triangle = new Triangle(this.context);
-    this.triangle.initalize();
+    this.meshes[0].geometry.initalize(this.context);
 
     const tempMat = mat4.create();
-    const uboArray = new Float32Array([...this.triangle.modelMatrix, ...tempMat, ...tempMat]);
+    const uboArray = new Float32Array([...this.meshes[0].modelMatrix, ...tempMat, ...tempMat]);
     this.uniformBuffer = createBuffer(this.device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
 
     // create shader modules
@@ -218,7 +225,7 @@ export default class WebGPURenderer {
       primitiveTopology: 'triangle-list',
       colorStates: [colorState],
       depthStencilState,
-      vertexState: this.triangle.vertexState,
+      vertexState: this.meshes[0].geometry.vertexState,
       rasterizationState,
     };
 
@@ -233,8 +240,6 @@ export default class WebGPURenderer {
     this.colorTexture = this.swapchain.getCurrentTexture();
     this.colorTextureView = this.colorTexture.createView();
 
-    this.triangle.rotateEuler(0, 0, 0.5);
-
     this.updateUniformBuffer(camera);
     this.encodeCommands();
   };
@@ -243,5 +248,9 @@ export default class WebGPURenderer {
     await this.initialize();
     this.reCreateSwapChain();
     await this.initializeResources();
+  }
+
+  public addMesh(mesh: WebGPUMesh): void {
+    this.meshes.push(mesh);
   }
 }
