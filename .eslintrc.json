@@ -1,0 +1,43 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "env": {
+    "node": true,
+    "browser": true,
+    "es6": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "prettier/@typescript-eslint"
+  ],
+  "rules": {
+    // note you must disable the base rule as it can report incorrect errors
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "args": "after-used",
+        "ignoreRestSiblings": false
+      }
+    ],
+    "@typescript-eslint/no-require-imports": "warn",
+    "@typescript-eslint/no-var-requires": "warn",
+    "@typescript-eslint/interface-name-prefix": "off",
+    //"@typescript-eslint/interface-name-prefix": ["warn", { "prefixWithI": "always" }],
+    "@typescript-eslint/no-parameter-properties": ["off"],
+    "@typescript-eslint/explicit-function-return-type": ["warn", { "allowExpressions": true }],
+    "@typescript-eslint/explicit-member-accessibility": ["error", { "accessibility": "explicit" }],
+    //"@typescript-eslint/explicit-member-accessibility": ["error"],
+    "eqeqeq": "error",
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "linebreak-style": ["error", "unix"],
+    "no-warning-comments": "warn",
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"]
+    //"sort-imports": "warn"
+  }
+}
