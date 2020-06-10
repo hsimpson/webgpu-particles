@@ -20,7 +20,7 @@ renderer.start();
 const renderer = new WebGPURenderer(canvas);
 
 const camera = new Camera(45, canvas.width / canvas.height, 0.1, 1000);
-camera.position = [0, 0, 5];
+camera.position = [0, 0, 10];
 camera.updateMatrices();
 
 const triangleGeometry = new WebGPUInterleavedGeometry();
@@ -44,16 +44,29 @@ triangleGeometry.addAttribute({
 });
 */
 
-const triangleMesh = new WebGPUMesh(triangleGeometry);
+const triangleMesh1 = new WebGPUMesh(triangleGeometry);
+const triangleMesh2 = new WebGPUMesh(triangleGeometry);
+const triangleMesh3 = new WebGPUMesh(triangleGeometry);
+const triangleMesh4 = new WebGPUMesh(triangleGeometry);
+triangleMesh1.translate([-2, 2, 0]);
+triangleMesh2.translate([2, 2, 0]);
+triangleMesh3.translate([-2, -2, 0]);
+triangleMesh4.translate([2, -2, 0]);
 
 const render = (): void => {
-  triangleMesh.rotateEuler(0, 0, 0.5);
+  triangleMesh1.rotateEuler(0, 0, 0.5);
+  triangleMesh2.rotateEuler(0, 0, 1);
+  triangleMesh3.rotateEuler(0, 0, 1.5);
+  triangleMesh4.rotateEuler(0, 0, 2);
   renderer.render(camera);
 
   requestAnimationFrame(render);
 };
 
-renderer.addMesh(triangleMesh);
+renderer.addMesh(triangleMesh1);
+renderer.addMesh(triangleMesh2);
+renderer.addMesh(triangleMesh3);
+renderer.addMesh(triangleMesh4);
 
 renderer.start().then(
   () => {

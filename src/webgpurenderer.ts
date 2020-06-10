@@ -7,34 +7,30 @@ import Camera from './camera';
 import WebGPURenderContext from './webgpurendercontext';
 import WebGPUMesh from './webgpumesh';
 export default class WebGPURenderer {
-  private canvas: HTMLCanvasElement;
-  private adapter: GPUAdapter;
-  private device: GPUDevice;
-  private queue: GPUQueue;
-  private context: WebGPURenderContext;
+  private _canvas: HTMLCanvasElement;
+  private _adapter: GPUAdapter;
+  private _device: GPUDevice;
+  private _queue: GPUQueue;
+  private _context: WebGPURenderContext;
 
-  private uniformBuffer: GPUBuffer;
-
-  private meshes: WebGPUMesh[] = [];
+  private _meshes: WebGPUMesh[] = [];
 
   // shader modules
-  private vertexModule: GPUShaderModule;
-  private fragmentModule: GPUShaderModule;
+  private _vertexModule: GPUShaderModule;
+  private _fragmentModule: GPUShaderModule;
 
-  private pipeline: GPURenderPipeline;
-  private swapchain: GPUSwapChain;
-  private colorTexture: GPUTexture;
-  private colorTextureView: GPUTextureView;
-  private depthTexture: GPUTexture;
-  private depthTextureView: GPUTextureView;
+  private _pipeline: GPURenderPipeline;
+  private _swapchain: GPUSwapChain;
+  private _colorTexture: GPUTexture;
+  private _colorTextureView: GPUTextureView;
+  private _depthTexture: GPUTexture;
+  private _depthTextureView: GPUTextureView;
 
-  private commandEncoder: GPUCommandEncoder;
-  private passEncoder: GPURenderPassEncoder;
-
-  private uniformBindGroup: GPUBindGroup;
+  private _uniformBufferCamera: GPUBuffer;
+  private _uniformBindGroupCamera: GPUBindGroup;
 
   public constructor(canvas: HTMLCanvasElement) {
-    this.canvas = canvas;
+    this._canvas = canvas;
   }
 
   private async initialize(): Promise<void> {
@@ -43,29 +39,28 @@ export default class WebGPURenderer {
       throw new Error('No WebGPU support navigator.gpu not available!');
     }
 
-    this.adapter = await gpu.requestAdapter();
+    this._adapter = await gpu.requestAdapter();
 
-    this.device = await this.adapter.requestDevice();
+    this._device = await this._adapter.requestDevice();
 
-    this.queue = this.device.defaultQueue;
+    this._queue = this._device.defaultQueue;
 
-    this.context = new WebGPURenderContext(this.canvas, this.device, this.queue);
+    this._context = new WebGPURenderContext(this._canvas, this._device, this._queue);
   }
 
-  private updateUniformBuffer(camera: Camera): void {
-    const uboArray = new Float32Array([
-      ...this.meshes[0].modelMatrix,
-      ...camera.viewMatrix,
-      ...camera.perspectiveMatrix,
-    ]);
-    this.queue.writeBuffer(this.uniformBuffer, 0, uboArray.buffer);
+  private updateUniformBufferCamera(camera: Camera): void {
+    if (camera.needsUpdate) {
+      const uboArray = new Float32Array([...camera.viewMatrix, ...camera.perspectiveMatrix]);
+      this._queue.writeBuffer(this._uniformBufferCamera, 0, uboArray.buffer);
+      camera.needsUpdate = false;
+    }
   }
 
   private async loadShader(path: string): Promise<GPUShaderModule> {
     const response = await fetch(path);
     const buffer = await response.arrayBuffer();
 
-    const shaderModule = this.device.createShaderModule({
+    const shaderModule = this._device.createShaderModule({
       code: new Uint32Array(buffer),
     });
 
@@ -73,19 +68,19 @@ export default class WebGPURenderer {
   }
 
   private reCreateSwapChain(): void {
-    if (!this.swapchain) {
-      const context: GPUCanvasContext = (this.canvas.getContext('gpupresent') as unknown) as GPUCanvasContext;
+    if (!this._swapchain) {
+      const context: GPUCanvasContext = (this._canvas.getContext('gpupresent') as unknown) as GPUCanvasContext;
       const swapChainDesc: GPUSwapChainDescriptor = {
-        device: this.device,
+        device: this._device,
         format: 'bgra8unorm',
         usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
       };
-      this.swapchain = context.configureSwapChain(swapChainDesc);
+      this._swapchain = context.configureSwapChain(swapChainDesc);
     }
 
     const depthSize: GPUExtent3D = {
-      width: this.canvas.width,
-      height: this.canvas.height,
+      width: this._canvas.width,
+      height: this._canvas.height,
       depth: 1,
     };
 
@@ -99,19 +94,19 @@ export default class WebGPURenderer {
       usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
     };
 
-    this.depthTexture = this.device.createTexture(depthTextureDesc);
-    this.depthTextureView = this.depthTexture.createView();
+    this._depthTexture = this._device.createTexture(depthTextureDesc);
+    this._depthTextureView = this._depthTexture.createView();
   }
 
   private encodeCommands(): void {
     const colorAttachment: GPURenderPassColorAttachmentDescriptor = {
-      attachment: this.colorTextureView,
+      attachment: this._colorTextureView,
       loadValue: { r: 0, g: 0, b: 0, a: 1 },
       storeOp: 'store',
     };
 
     const depthAttachment: GPURenderPassDepthStencilAttachmentDescriptor = {
-      attachment: this.depthTextureView,
+      attachment: this._depthTextureView,
       depthLoadValue: 1,
       depthStoreOp: 'store',
       stencilLoadValue: 'load',
@@ -123,39 +118,43 @@ export default class WebGPURenderer {
       depthStencilAttachment: depthAttachment,
     };
 
-    const geometry = this.meshes[0].geometry;
+    const commandEncoder = this._device.createCommandEncoder();
 
-    this.commandEncoder = this.device.createCommandEncoder();
+    const passEncoder = commandEncoder.beginRenderPass(renderPassDesc);
+    passEncoder.setPipeline(this._pipeline);
+    passEncoder.setViewport(0, 0, this._canvas.width, this._canvas.height, 0, 1);
+    passEncoder.setScissorRect(0, 0, this._canvas.width, this._canvas.height);
 
-    this.passEncoder = this.commandEncoder.beginRenderPass(renderPassDesc);
-    this.passEncoder.setPipeline(this.pipeline);
-    this.passEncoder.setBindGroup(0, this.uniformBindGroup);
-    this.passEncoder.setViewport(0, 0, this.canvas.width, this.canvas.height, 0, 1);
-    this.passEncoder.setScissorRect(0, 0, this.canvas.width, this.canvas.height);
-    for (let i = 0; i < geometry.vertexBuffers.length; i++) {
-      this.passEncoder.setVertexBuffer(i, geometry.vertexBuffers[i]);
+    passEncoder.setBindGroup(0, this._uniformBindGroupCamera);
+
+    for (const mesh of this._meshes) {
+      const geometry = mesh.geometry;
+      mesh.updateUniformBuffer(this._context);
+
+      passEncoder.setBindGroup(1, mesh.uniformBindGroup);
+
+      for (let i = 0; i < geometry.vertexBuffers.length; i++) {
+        passEncoder.setVertexBuffer(i, geometry.vertexBuffers[i]);
+      }
+      if (geometry.indexCount > 0) {
+        passEncoder.setIndexBuffer(geometry.indexBuffer);
+        passEncoder.drawIndexed(geometry.indexCount, 1, 0, 0, 0);
+      } else {
+        passEncoder.draw(geometry.vertexCount, 1, 0, 0);
+      }
     }
-    if (geometry.indexCount > 0) {
-      this.passEncoder.setIndexBuffer(geometry.indexBuffer);
-      this.passEncoder.drawIndexed(geometry.indexCount, 1, 0, 0, 0);
-    } else {
-      this.passEncoder.draw(geometry.vertexCount, 1, 0, 0);
-    }
-    this.passEncoder.endPass();
-
-    this.queue.submit([this.commandEncoder.finish()]);
+    passEncoder.endPass();
+    this._queue.submit([commandEncoder.finish()]);
   }
 
   private async initializeResources(): Promise<void> {
-    this.meshes[0].geometry.initalize(this.context);
-
     const tempMat = mat4.create();
-    const uboArray = new Float32Array([...this.meshes[0].modelMatrix, ...tempMat, ...tempMat]);
-    this.uniformBuffer = createBuffer(this.device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
+    const uboArray = new Float32Array([...tempMat, ...tempMat]);
+    this._uniformBufferCamera = createBuffer(this._device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
 
     // create shader modules
-    this.vertexModule = await this.loadShader('basic.vert.spv');
-    this.fragmentModule = await this.loadShader('basic.frag.spv');
+    this._vertexModule = await this.loadShader('basic.vert.spv');
+    this._fragmentModule = await this.loadShader('basic.frag.spv');
 
     const depthStencilState: GPUDepthStencilStateDescriptor = {
       depthWriteEnabled: true,
@@ -163,7 +162,7 @@ export default class WebGPURenderer {
       format: 'depth24plus-stencil8',
     };
 
-    const uniformBindGroupLayout = this.device.createBindGroupLayout({
+    const uniformBindGroupLayoutCamera = this._context.device.createBindGroupLayout({
       entries: [
         {
           binding: 0,
@@ -173,28 +172,44 @@ export default class WebGPURenderer {
       ],
     });
 
-    this.uniformBindGroup = this.device.createBindGroup({
-      layout: uniformBindGroupLayout,
+    const uniformBindGroupLayoutMesh = this._context.device.createBindGroupLayout({
+      entries: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.VERTEX,
+          type: 'uniform-buffer',
+        },
+      ],
+    });
+
+    for (const mesh of this._meshes) {
+      mesh.initalize(this._context, uniformBindGroupLayoutMesh);
+    }
+
+    this._uniformBindGroupCamera = this._device.createBindGroup({
+      layout: uniformBindGroupLayoutCamera,
       entries: [
         {
           binding: 0,
           resource: {
-            buffer: this.uniformBuffer,
+            buffer: this._uniformBufferCamera,
           },
         },
       ],
     });
 
-    const piplineLayoutDesc: GPUPipelineLayoutDescriptor = { bindGroupLayouts: [uniformBindGroupLayout] };
-    const layout = this.device.createPipelineLayout(piplineLayoutDesc);
+    const piplineLayoutDesc: GPUPipelineLayoutDescriptor = {
+      bindGroupLayouts: [uniformBindGroupLayoutCamera, uniformBindGroupLayoutMesh],
+    };
+    const layout = this._device.createPipelineLayout(piplineLayoutDesc);
 
     const vertexStage: GPUProgrammableStageDescriptor = {
-      module: this.vertexModule,
+      module: this._vertexModule,
       entryPoint: 'main',
     };
 
     const fragmentStage: GPUProgrammableStageDescriptor = {
-      module: this.fragmentModule,
+      module: this._fragmentModule,
       entryPoint: 'main',
     };
 
@@ -225,11 +240,11 @@ export default class WebGPURenderer {
       primitiveTopology: 'triangle-list',
       colorStates: [colorState],
       depthStencilState,
-      vertexState: this.meshes[0].geometry.vertexState,
+      vertexState: this._meshes[1].geometry.vertexState,
       rasterizationState,
     };
 
-    this.pipeline = this.device.createRenderPipeline(pipelineDesc);
+    this._pipeline = this._device.createRenderPipeline(pipelineDesc);
   }
 
   public resize(): void {
@@ -237,10 +252,10 @@ export default class WebGPURenderer {
   }
 
   public render = (camera: Camera): void => {
-    this.colorTexture = this.swapchain.getCurrentTexture();
-    this.colorTextureView = this.colorTexture.createView();
+    this._colorTexture = this._swapchain.getCurrentTexture();
+    this._colorTextureView = this._colorTexture.createView();
 
-    this.updateUniformBuffer(camera);
+    this.updateUniformBufferCamera(camera);
     this.encodeCommands();
   };
 
@@ -251,6 +266,6 @@ export default class WebGPURenderer {
   }
 
   public addMesh(mesh: WebGPUMesh): void {
-    this.meshes.push(mesh);
+    this._meshes.push(mesh);
   }
 }
