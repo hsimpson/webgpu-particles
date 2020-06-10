@@ -4,9 +4,13 @@ import WebGPURenderer from './webgpurenderer';
 import Camera from './camera';
 import ResizeObserver from 'resize-observer-polyfill';
 import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
-import WebGPUGeometry from './webgpugeometry';
-import { VERTEXARRAYINTERLEAVED, POSARRAY, COLORARRAY, INDICES } from './triangledata';
+import { VERTEXARRAYINTERLEAVED, INDICES } from './triangledata';
+
+//import WebGPUGeometry from './webgpugeometry';
+//import { POSARRAY, COLORARRAY, INDICES } from './triangledata';
+
 import WebGPUMesh from './webgpumesh';
+import { vec2 } from 'gl-matrix';
 
 const canvas: HTMLCanvasElement = document.getElementById('webgpu_canvas') as HTMLCanvasElement;
 canvas.width = canvas.offsetWidth * window.devicePixelRatio;
@@ -31,7 +35,7 @@ triangleGeometry.addAttribute({ shaderLocation: 1, offset: 4 * Float32Array.BYTE
 
 /*
 const triangleGeometry = new WebGPUGeometry(3);
-//triangleGeometry.setIndices(INDICES);
+triangleGeometry.setIndices(INDICES);
 triangleGeometry.addAttribute({
   array: POSARRAY,
   stride: 4 * Float32Array.BYTES_PER_ELEMENT,
@@ -53,11 +57,17 @@ triangleMesh2.translate([2, 2, 0]);
 triangleMesh3.translate([-2, -2, 0]);
 triangleMesh4.translate([2, -2, 0]);
 
+renderer.addMesh(triangleMesh1);
+renderer.addMesh(triangleMesh2);
+renderer.addMesh(triangleMesh3);
+renderer.addMesh(triangleMesh4);
+
 let time = 0;
 let framecount = 0;
 let durationAvg = 0;
 const framtimeEl = document.getElementById('frameinfo');
 const rotation = 0.05;
+let currentMousePos = vec2.create();
 
 const render = (): void => {
   framecount++;
@@ -82,10 +92,27 @@ const render = (): void => {
   requestAnimationFrame(render);
 };
 
-renderer.addMesh(triangleMesh1);
-renderer.addMesh(triangleMesh2);
-renderer.addMesh(triangleMesh3);
-renderer.addMesh(triangleMesh4);
+const onMouseWheel = (event: WheelEvent): void => {
+  let z = (camera.position[2] += event.deltaY * 0.01);
+  z = Math.max(camera.zNear, Math.min(camera.zFar, z));
+  camera.position[2] = z;
+  camera.updateMatrices();
+};
+
+const onMouseMove = (event: MouseEvent): void => {
+  const currentPos: vec2 = [event.clientX, event.clientY];
+  if (event.buttons === 1) {
+    let offset = vec2.create();
+    offset = vec2.subtract(offset, currentPos, currentMousePos);
+    offset = vec2.scale(offset, offset, 0.1);
+
+    //console.log(offset);
+
+    camera.rotateEuler(0.0, offset[0], 0.0);
+    camera.rotateEuler(offset[1], 0.0, 0.0);
+  }
+  currentMousePos = currentPos;
+};
 
 renderer.start().then(
   () => {
@@ -105,12 +132,8 @@ renderer.start().then(
     });
     ro.observe(canvas);
 
-    canvas.addEventListener('wheel', (event: WheelEvent) => {
-      let z = (camera.position[2] += event.deltaY * 0.01);
-      z = Math.max(camera.zNear, Math.min(camera.zFar, z));
-      camera.position[2] = z;
-      camera.updateMatrices();
-    });
+    canvas.addEventListener('wheel', onMouseWheel);
+    canvas.addEventListener('mousemove', onMouseMove);
     render();
   },
   (error) => {

@@ -1,8 +1,9 @@
-import { vec3, mat4, glMatrix } from 'gl-matrix';
+import { vec3, mat4, quat, glMatrix } from 'gl-matrix';
 
 export default class Camera {
   private _perspectiveMatrix = mat4.create();
   private _viewMatrix = mat4.create();
+  private _rotation = quat.create();
   public position: vec3 = vec3.create();
   public target: vec3 = vec3.create();
   public up: vec3 = [0, 1, 0];
@@ -34,7 +35,15 @@ export default class Camera {
   }
 
   private updateViewMatrix(): void {
-    this._viewMatrix = mat4.lookAt(this.viewMatrix, this.position, this.target, this.up);
+    const translationMatrix = mat4.create();
+    const rotationMatrix = mat4.create();
+
+    //mat4.translate(translationMatrix, translationMatrix, this.position);
+    mat4.lookAt(translationMatrix, this.position, this.target, this.up);
+    mat4.fromQuat(rotationMatrix, this._rotation);
+
+    this._viewMatrix = mat4.multiply(this._viewMatrix, translationMatrix, rotationMatrix);
+
     this.needsUpdate = true;
   }
 
@@ -47,5 +56,16 @@ export default class Camera {
       this.zFar
     );
     this.needsUpdate = true;
+  }
+
+  public rotateQuat(rotation: quat): void {
+    this._rotation = quat.multiply(this._rotation, rotation, this._rotation);
+    this.updateViewMatrix();
+  }
+
+  public rotateEuler(angleX: number, angelY: number, angleZ: number): void {
+    let tempQuat = quat.create();
+    tempQuat = quat.fromEuler(tempQuat, angleX, angelY, angleZ);
+    this.rotateQuat(tempQuat);
   }
 }
