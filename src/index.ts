@@ -3,12 +3,9 @@ import './style.css';
 import WebGPURenderer from './webgpurenderer';
 import Camera from './camera';
 import ResizeObserver from 'resize-observer-polyfill';
-import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
-import { VERTEXARRAYINTERLEAVED, INDICES } from './triangledata';
-
-//import WebGPUGeometry from './webgpugeometry';
-//import { POSARRAY, COLORARRAY, INDICES } from './triangledata';
-
+//import { TriangleGeometry } from './trianglegeometry';
+import { BoxGeometry } from './boxgeometry';
+import { CrossHairGeometry } from './crosshairgeometry';
 import WebGPUMesh from './webgpumesh';
 import { vec2 } from 'gl-matrix';
 
@@ -27,31 +24,12 @@ const camera = new Camera(45, canvas.width / canvas.height, 0.1, 1000);
 camera.position = [0, 0, 10];
 camera.updateMatrices();
 
-const triangleGeometry = new WebGPUInterleavedGeometry();
-triangleGeometry.setVertices(VERTEXARRAYINTERLEAVED, 4 * 8);
-triangleGeometry.setIndices(INDICES);
-triangleGeometry.addAttribute({ shaderLocation: 0, offset: 0, format: 'float4' });
-triangleGeometry.addAttribute({ shaderLocation: 1, offset: 4 * Float32Array.BYTES_PER_ELEMENT, format: 'float4' });
-
-/*
-const triangleGeometry = new WebGPUGeometry(3);
-triangleGeometry.setIndices(INDICES);
-triangleGeometry.addAttribute({
-  array: POSARRAY,
-  stride: 4 * Float32Array.BYTES_PER_ELEMENT,
-  descriptor: { shaderLocation: 0, offset: 0, format: 'float4' },
-});
-triangleGeometry.addAttribute({
-  array: COLORARRAY,
-  stride: 4 * Float32Array.BYTES_PER_ELEMENT,
-  descriptor: { shaderLocation: 1, offset: 0, format: 'float4' },
-});
-*/
-
-const triangleMesh1 = new WebGPUMesh(triangleGeometry);
-const triangleMesh2 = new WebGPUMesh(triangleGeometry);
-const triangleMesh3 = new WebGPUMesh(triangleGeometry);
-const triangleMesh4 = new WebGPUMesh(triangleGeometry);
+/*/
+const rotation = 0.05;
+const triangleMesh1 = new WebGPUMesh(TriangleGeometry);
+const triangleMesh2 = new WebGPUMesh(TriangleGeometry);
+const triangleMesh3 = new WebGPUMesh(TriangleGeometry);
+const triangleMesh4 = new WebGPUMesh(TriangleGeometry);
 triangleMesh1.translate([-2, 2, 0]);
 triangleMesh2.translate([2, 2, 0]);
 triangleMesh3.translate([-2, -2, 0]);
@@ -61,12 +39,19 @@ renderer.addMesh(triangleMesh1);
 renderer.addMesh(triangleMesh2);
 renderer.addMesh(triangleMesh3);
 renderer.addMesh(triangleMesh4);
+/**/
+
+/**/
+const boxMesh = new WebGPUMesh(BoxGeometry);
+const crossHairMesh = new WebGPUMesh(CrossHairGeometry);
+renderer.addMesh(boxMesh);
+renderer.addMesh(crossHairMesh);
+/**/
 
 let time = 0;
 let framecount = 0;
 let durationAvg = 0;
 const framtimeEl = document.getElementById('frameinfo');
-const rotation = 0.05;
 let currentMousePos = vec2.create();
 
 const render = (): void => {
@@ -83,17 +68,20 @@ const render = (): void => {
     framtimeEl.innerHTML = `Avg frame time: ${avgFrameTime.toFixed(3)} ms<br>FPS: ${(1000 / avgFrameTime).toFixed(2)}`;
   }
 
+  /*/
   triangleMesh1.rotateEuler(0, 0, duration * rotation);
   triangleMesh2.rotateEuler(0, 0, duration * rotation * -1.5);
   triangleMesh3.rotateEuler(0, 0, duration * rotation * 2);
   triangleMesh4.rotateEuler(0, 0, duration * rotation * -2.5);
+  /**/
+
   renderer.render(camera);
 
   requestAnimationFrame(render);
 };
 
 const onMouseWheel = (event: WheelEvent): void => {
-  let z = (camera.position[2] += event.deltaY * 0.01);
+  let z = (camera.position[2] += event.deltaY * 0.02);
   z = Math.max(camera.zNear, Math.min(camera.zFar, z));
   camera.position[2] = z;
   camera.updateMatrices();
@@ -104,7 +92,7 @@ const onMouseMove = (event: MouseEvent): void => {
   if (event.buttons === 1) {
     let offset = vec2.create();
     offset = vec2.subtract(offset, currentPos, currentMousePos);
-    offset = vec2.scale(offset, offset, 0.1);
+    offset = vec2.scale(offset, offset, 0.2);
 
     //console.log(offset);
 

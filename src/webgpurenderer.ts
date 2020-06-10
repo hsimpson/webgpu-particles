@@ -238,10 +238,12 @@ export default class WebGPURenderer {
       layout,
       vertexStage,
       fragmentStage,
-      primitiveTopology: 'triangle-list',
+      primitiveTopology: 'line-list',
+      //primitiveTopology: 'triangle-list',
       colorStates: [colorState],
       depthStencilState,
-      vertexState: this._meshes[1].geometry.vertexState,
+      // FIXME: this should be managed better then using the 1st geometry
+      vertexState: this._meshes[0].geometry.vertexState,
       rasterizationState,
     };
 
