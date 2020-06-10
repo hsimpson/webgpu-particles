@@ -6,6 +6,7 @@ import { createBuffer } from './webgpuhelpers';
 import Camera from './camera';
 import WebGPURenderContext from './webgpurendercontext';
 import WebGPUMesh from './webgpumesh';
+
 export default class WebGPURenderer {
   private _canvas: HTMLCanvasElement;
   private _adapter: GPUAdapter;

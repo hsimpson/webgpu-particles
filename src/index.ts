@@ -53,11 +53,30 @@ triangleMesh2.translate([2, 2, 0]);
 triangleMesh3.translate([-2, -2, 0]);
 triangleMesh4.translate([2, -2, 0]);
 
+let time = 0;
+let framecount = 0;
+let durationAvg = 0;
+const framtimeEl = document.getElementById('frameinfo');
+const rotation = 0.05;
+
 const render = (): void => {
-  triangleMesh1.rotateEuler(0, 0, 0.5);
-  triangleMesh2.rotateEuler(0, 0, 1);
-  triangleMesh3.rotateEuler(0, 0, 1.5);
-  triangleMesh4.rotateEuler(0, 0, 2);
+  framecount++;
+  const now = performance.now();
+  const duration = now - time;
+  durationAvg += duration;
+  time = now;
+
+  if (durationAvg > 1000) {
+    const avgFrameTime = durationAvg / framecount;
+    framecount = 0;
+    durationAvg = 0;
+    framtimeEl.innerHTML = `Avg frame time: ${avgFrameTime.toFixed(3)} ms<br>FPS: ${(1000 / avgFrameTime).toFixed(2)}`;
+  }
+
+  triangleMesh1.rotateEuler(0, 0, duration * rotation);
+  triangleMesh2.rotateEuler(0, 0, duration * rotation * -1.5);
+  triangleMesh3.rotateEuler(0, 0, duration * rotation * 2);
+  triangleMesh4.rotateEuler(0, 0, duration * rotation * -2.5);
   renderer.render(camera);
 
   requestAnimationFrame(render);

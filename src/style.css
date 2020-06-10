@@ -24,3 +24,11 @@ body {
   font-size: 22px;
   font-weight: bold;
 }
+
+#frameinfo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #fff;
+  padding: 10px;
+}
