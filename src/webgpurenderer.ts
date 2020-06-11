@@ -22,13 +22,17 @@ export default class WebGPURenderer {
 
   private _pipeline: GPURenderPipeline;
   private _swapchain: GPUSwapChain;
-  private _colorTexture: GPUTexture;
+
   private _colorTextureView: GPUTextureView;
-  private _depthTexture: GPUTexture;
   private _depthTextureView: GPUTextureView;
+
+  private readonly _colorTextureFormat: GPUTextureFormat = 'bgra8unorm';
+  private readonly _depthTextureFormat: GPUTextureFormat = 'depth24plus-stencil8';
 
   private _uniformBufferCamera: GPUBuffer;
   private _uniformBindGroupCamera: GPUBindGroup;
+
+  private readonly _sampleCount = 4;
 
   public constructor(canvas: HTMLCanvasElement) {
     this._canvas = canvas;
@@ -73,38 +77,55 @@ export default class WebGPURenderer {
       const context: GPUCanvasContext = (this._canvas.getContext('gpupresent') as unknown) as GPUCanvasContext;
       const swapChainDesc: GPUSwapChainDescriptor = {
         device: this._device,
-        format: 'bgra8unorm',
+        format: this._colorTextureFormat,
         usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
       };
       this._swapchain = context.configureSwapChain(swapChainDesc);
     }
 
-    const depthSize: GPUExtent3D = {
+    const textureSize: GPUExtent3D = {
       width: this._canvas.width,
       height: this._canvas.height,
       depth: 1,
     };
 
     const depthTextureDesc: GPUTextureDescriptor = {
-      size: depthSize,
+      size: textureSize,
       //arrayLayerCount: 1, // FIXME: possible move to GPUTextureViewDescriptor?!
       mipLevelCount: 1,
-      sampleCount: 1,
+      sampleCount: this._sampleCount,
       dimension: '2d',
-      format: 'depth24plus-stencil8',
+      format: this._depthTextureFormat,
       usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
     };
 
-    this._depthTexture = this._device.createTexture(depthTextureDesc);
-    this._depthTextureView = this._depthTexture.createView();
+    const depthTexture = this._device.createTexture(depthTextureDesc);
+    this._depthTextureView = depthTexture.createView();
+
+    const colorTextureDesc: GPUTextureDescriptor = {
+      size: textureSize,
+      sampleCount: this._sampleCount,
+      format: this._colorTextureFormat,
+      usage: GPUTextureUsage.OUTPUT_ATTACHMENT,
+    };
+
+    const colorTexture = this._device.createTexture(colorTextureDesc);
+    this._colorTextureView = colorTexture.createView();
   }
 
   private encodeCommands(): void {
     const colorAttachment: GPURenderPassColorAttachmentDescriptor = {
-      attachment: this._colorTextureView,
+      attachment: null,
       loadValue: { r: 0, g: 0, b: 0, a: 1 },
       storeOp: 'store',
     };
+
+    if (this._sampleCount > 1) {
+      colorAttachment.attachment = this._colorTextureView;
+      colorAttachment.resolveTarget = this._swapchain.getCurrentTexture().createView();
+    } else {
+      colorAttachment.attachment = this._swapchain.getCurrentTexture().createView();
+    }
 
     const depthAttachment: GPURenderPassDepthStencilAttachmentDescriptor = {
       attachment: this._depthTextureView,
@@ -160,7 +181,7 @@ export default class WebGPURenderer {
     const depthStencilState: GPUDepthStencilStateDescriptor = {
       depthWriteEnabled: true,
       depthCompare: 'less',
-      format: 'depth24plus-stencil8',
+      format: this._depthTextureFormat,
     };
 
     const uniformBindGroupLayoutCamera = this._context.device.createBindGroupLayout({
@@ -215,7 +236,7 @@ export default class WebGPURenderer {
     };
 
     const colorState: GPUColorStateDescriptor = {
-      format: 'bgra8unorm',
+      format: this._colorTextureFormat,
       alphaBlend: {
         srcFactor: 'src-alpha',
         dstFactor: 'one-minus-src-alpha',
@@ -245,6 +266,7 @@ export default class WebGPURenderer {
       // FIXME: this should be managed better then using the 1st geometry
       vertexState: this._meshes[0].geometry.vertexState,
       rasterizationState,
+      sampleCount: this._sampleCount,
     };
 
     this._pipeline = this._device.createRenderPipeline(pipelineDesc);
@@ -255,9 +277,6 @@ export default class WebGPURenderer {
   }
 
   public render = (camera: Camera): void => {
-    this._colorTexture = this._swapchain.getCurrentTexture();
-    this._colorTextureView = this._colorTexture.createView();
-
     this.updateUniformBufferCamera(camera);
     this.encodeCommands();
   };
