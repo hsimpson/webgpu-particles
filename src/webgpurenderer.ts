@@ -259,6 +259,7 @@ export default class WebGPURenderer {
       layout,
       vertexStage,
       fragmentStage,
+      // FIXME: move topology to mesh
       primitiveTopology: 'line-list',
       //primitiveTopology: 'triangle-list',
       colorStates: [colorState],
