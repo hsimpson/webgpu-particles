@@ -3,25 +3,28 @@ import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
 import WebGPUGeometry from './webgpugeometry';
 import WebGPURenderContext from './webgpurendercontext';
 import { createBuffer } from './webgpuhelpers';
+import WebGPURenderPipeline from './webgpurenderpipeline';
 
 export default class WebGPUMesh extends WebGPUEntity {
   private _geometry: WebGPUInterleavedGeometry | WebGPUGeometry;
   private _initialized = false;
   private _uniformBuffer: GPUBuffer;
-  //private static _uniformBindGroupLayout: GPUBindGroupLayout;
   private _uniformBindGroup: GPUBindGroup;
 
-  public constructor(geometry: WebGPUInterleavedGeometry | WebGPUGeometry) {
+  private _pipeline: WebGPURenderPipeline;
+
+  public constructor(geometry: WebGPUInterleavedGeometry | WebGPUGeometry, pipeline: WebGPURenderPipeline) {
     super();
     this._geometry = geometry;
+    this._pipeline = pipeline;
   }
 
-  public initalize(context: WebGPURenderContext, bindGroupLayout: GPUBindGroupLayout): void {
-    this._geometry.initalize(context);
-
+  public async initalize(context: WebGPURenderContext, bindGroupLayout: GPUBindGroupLayout): Promise<void> {
     if (this._initialized) {
       return;
     }
+    this._geometry.initalize(context);
+    await this._pipeline.initalize(context, this._geometry.vertexState);
 
     const uboArray = new Float32Array([...this.modelMatrix]);
     this._uniformBuffer = createBuffer(context.device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
@@ -55,6 +58,10 @@ export default class WebGPUMesh extends WebGPUEntity {
 
   public get uniformBindGroup(): GPUBindGroup {
     return this._uniformBindGroup;
+  }
+
+  public get gpuPipeline(): GPURenderPipeline {
+    return this._pipeline.gpuPipeline;
   }
 
   /*

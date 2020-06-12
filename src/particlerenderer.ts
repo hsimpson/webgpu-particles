@@ -3,11 +3,12 @@ import './style.css';
 import WebGPURenderer from './webgpurenderer';
 import Camera from './camera';
 import ResizeObserver from 'resize-observer-polyfill';
-//import { TriangleGeometry } from './trianglegeometry';
+import { TriangleGeometry } from './trianglegeometry';
 import { BoxGeometry } from './boxgeometry';
 import { CrossHairGeometry } from './crosshairgeometry';
 import WebGPUMesh from './webgpumesh';
 import { vec2 } from 'gl-matrix';
+import WebGPURenderPipeline from './webgpurenderpipeline';
 
 export default class ParticleRenderer {
   private _canvas: HTMLCanvasElement;
@@ -19,7 +20,7 @@ export default class ParticleRenderer {
   private _crossHairMesh: WebGPUMesh;
   /**/
 
-  /*/
+  /**/
   private _triangleMesh1: WebGPUMesh;
   private _triangleMesh2: WebGPUMesh;
   private _triangleMesh3: WebGPUMesh;
@@ -38,25 +39,32 @@ export default class ParticleRenderer {
     this._canvas = document.getElementById('webgpu_canvas') as HTMLCanvasElement;
     this._canvas.width = this._canvas.offsetWidth * window.devicePixelRatio;
     this._canvas.height = this._canvas.offsetHeight * window.devicePixelRatio;
-    this._renderer = new WebGPURenderer(this._canvas);
 
     this._camera = new Camera(45, this._canvas.width / this._canvas.height, 0.1, 1000);
     this._camera.position = [0, 0, 10];
     this._camera.updateMatrices();
 
+    this._renderer = new WebGPURenderer(this._canvas, this._camera);
+
+    const linePipeline = new WebGPURenderPipeline(this._camera, { primitiveTopology: 'line-list', sampleCount: 4 });
+    const trianglePipeline = new WebGPURenderPipeline(this._camera, {
+      primitiveTopology: 'triangle-list',
+      sampleCount: 4,
+    });
+
     /**/
-    this._boxMesh = new WebGPUMesh(BoxGeometry);
-    this._crossHairMesh = new WebGPUMesh(CrossHairGeometry);
+    this._boxMesh = new WebGPUMesh(BoxGeometry, linePipeline);
+    this._crossHairMesh = new WebGPUMesh(CrossHairGeometry, linePipeline);
 
     this._renderer.addMesh(this._boxMesh);
     this._renderer.addMesh(this._crossHairMesh);
     /**/
 
-    /*/
-    this._triangleMesh1 = new WebGPUMesh(TriangleGeometry);
-    this._triangleMesh2 = new WebGPUMesh(TriangleGeometry);
-    this._triangleMesh3 = new WebGPUMesh(TriangleGeometry);
-    this._triangleMesh4 = new WebGPUMesh(TriangleGeometry);
+    /**/
+    this._triangleMesh1 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
+    this._triangleMesh2 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
+    this._triangleMesh3 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
+    this._triangleMesh4 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
     this._triangleMesh1.translate([-2, 2, 0]);
     this._triangleMesh2.translate([2, 2, 0]);
     this._triangleMesh3.translate([-2, -2, 0]);
@@ -120,14 +128,14 @@ export default class ParticleRenderer {
       ).toFixed(2)}`;
     }
 
-    /*/
+    /**/
     this._triangleMesh1.rotateEuler(0, 0, duration * this._triangleRotation);
     this._triangleMesh2.rotateEuler(0, 0, duration * this._triangleRotation * -1.5);
     this._triangleMesh3.rotateEuler(0, 0, duration * this._triangleRotation * 2);
     this._triangleMesh4.rotateEuler(0, 0, duration * this._triangleRotation * -2.5);
     /**/
 
-    this._renderer.render(this._camera);
+    this._renderer.render();
 
     requestAnimationFrame(this.render);
   };

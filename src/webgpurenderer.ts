@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../node_modules/@webgpu/types/dist/index.d.ts" />
 
-import { mat4 } from 'gl-matrix';
-import { createBuffer } from './webgpuhelpers';
+//import { mat4 } from 'gl-matrix';
+//import { createBuffer } from './webgpuhelpers';
 import Camera from './camera';
 import WebGPURenderContext from './webgpurendercontext';
 import WebGPUMesh from './webgpumesh';
@@ -16,11 +16,6 @@ export default class WebGPURenderer {
 
   private _meshes: WebGPUMesh[] = [];
 
-  // shader modules
-  private _vertexModule: GPUShaderModule;
-  private _fragmentModule: GPUShaderModule;
-
-  private _pipeline: GPURenderPipeline;
   private _swapchain: GPUSwapChain;
 
   private _colorTextureView: GPUTextureView;
@@ -29,13 +24,13 @@ export default class WebGPURenderer {
   private readonly _colorTextureFormat: GPUTextureFormat = 'bgra8unorm';
   private readonly _depthTextureFormat: GPUTextureFormat = 'depth24plus-stencil8';
 
-  private _uniformBufferCamera: GPUBuffer;
-  private _uniformBindGroupCamera: GPUBindGroup;
-
   private readonly _sampleCount = 4;
 
-  public constructor(canvas: HTMLCanvasElement) {
+  private _camera: Camera;
+
+  public constructor(canvas: HTMLCanvasElement, camera: Camera) {
     this._canvas = canvas;
+    this._camera = camera;
   }
 
   private async initialize(): Promise<void> {
@@ -51,25 +46,6 @@ export default class WebGPURenderer {
     this._queue = this._device.defaultQueue;
 
     this._context = new WebGPURenderContext(this._canvas, this._device, this._queue);
-  }
-
-  private updateUniformBufferCamera(camera: Camera): void {
-    if (camera.needsUpdate) {
-      const uboArray = new Float32Array([...camera.viewMatrix, ...camera.perspectiveMatrix]);
-      this._queue.writeBuffer(this._uniformBufferCamera, 0, uboArray.buffer);
-      camera.needsUpdate = false;
-    }
-  }
-
-  private async loadShader(path: string): Promise<GPUShaderModule> {
-    const response = await fetch(path);
-    const buffer = await response.arrayBuffer();
-
-    const shaderModule = this._device.createShaderModule({
-      code: new Uint32Array(buffer),
-    });
-
-    return shaderModule;
   }
 
   private reCreateSwapChain(): void {
@@ -143,13 +119,13 @@ export default class WebGPURenderer {
     const commandEncoder = this._device.createCommandEncoder();
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDesc);
-    passEncoder.setPipeline(this._pipeline);
     passEncoder.setViewport(0, 0, this._canvas.width, this._canvas.height, 0, 1);
     passEncoder.setScissorRect(0, 0, this._canvas.width, this._canvas.height);
 
-    passEncoder.setBindGroup(0, this._uniformBindGroupCamera);
+    passEncoder.setBindGroup(0, this._camera.bindGroup);
 
     for (const mesh of this._meshes) {
+      passEncoder.setPipeline(mesh.gpuPipeline);
       const geometry = mesh.geometry;
       mesh.updateUniformBuffer(this._context);
 
@@ -170,30 +146,6 @@ export default class WebGPURenderer {
   }
 
   private async initializeResources(): Promise<void> {
-    const tempMat = mat4.create();
-    const uboArray = new Float32Array([...tempMat, ...tempMat]);
-    this._uniformBufferCamera = createBuffer(this._device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
-
-    // create shader modules
-    this._vertexModule = await this.loadShader('basic.vert.spv');
-    this._fragmentModule = await this.loadShader('basic.frag.spv');
-
-    const depthStencilState: GPUDepthStencilStateDescriptor = {
-      depthWriteEnabled: true,
-      depthCompare: 'less',
-      format: this._depthTextureFormat,
-    };
-
-    const uniformBindGroupLayoutCamera = this._context.device.createBindGroupLayout({
-      entries: [
-        {
-          binding: 0,
-          visibility: GPUShaderStage.VERTEX,
-          type: 'uniform-buffer',
-        },
-      ],
-    });
-
     const uniformBindGroupLayoutMesh = this._context.device.createBindGroupLayout({
       entries: [
         {
@@ -204,81 +156,22 @@ export default class WebGPURenderer {
       ],
     });
 
+    this._camera.initalize(this._context);
+
+    const meshInitializers: Promise<void>[] = [];
     for (const mesh of this._meshes) {
-      mesh.initalize(this._context, uniformBindGroupLayoutMesh);
+      meshInitializers.push(mesh.initalize(this._context, uniformBindGroupLayoutMesh));
     }
 
-    this._uniformBindGroupCamera = this._device.createBindGroup({
-      layout: uniformBindGroupLayoutCamera,
-      entries: [
-        {
-          binding: 0,
-          resource: {
-            buffer: this._uniformBufferCamera,
-          },
-        },
-      ],
-    });
-
-    const piplineLayoutDesc: GPUPipelineLayoutDescriptor = {
-      bindGroupLayouts: [uniformBindGroupLayoutCamera, uniformBindGroupLayoutMesh],
-    };
-    const layout = this._device.createPipelineLayout(piplineLayoutDesc);
-
-    const vertexStage: GPUProgrammableStageDescriptor = {
-      module: this._vertexModule,
-      entryPoint: 'main',
-    };
-
-    const fragmentStage: GPUProgrammableStageDescriptor = {
-      module: this._fragmentModule,
-      entryPoint: 'main',
-    };
-
-    const colorState: GPUColorStateDescriptor = {
-      format: this._colorTextureFormat,
-      alphaBlend: {
-        srcFactor: 'src-alpha',
-        dstFactor: 'one-minus-src-alpha',
-        operation: 'add',
-      },
-      colorBlend: {
-        srcFactor: 'src-alpha',
-        dstFactor: 'one-minus-src-alpha',
-        operation: 'add',
-      },
-      writeMask: GPUColorWrite.ALL,
-    };
-
-    const rasterizationState: GPURasterizationStateDescriptor = {
-      frontFace: 'cw',
-      cullMode: 'none',
-    };
-
-    const pipelineDesc: GPURenderPipelineDescriptor = {
-      layout,
-      vertexStage,
-      fragmentStage,
-      // FIXME: move topology to mesh
-      primitiveTopology: 'line-list',
-      //primitiveTopology: 'triangle-list',
-      colorStates: [colorState],
-      depthStencilState,
-      // FIXME: this should be managed better then using the 1st geometry
-      vertexState: this._meshes[0].geometry.vertexState,
-      rasterizationState,
-      sampleCount: this._sampleCount,
-    };
-
-    this._pipeline = this._device.createRenderPipeline(pipelineDesc);
+    await Promise.all(meshInitializers);
   }
 
   public resize(): void {
     this.reCreateSwapChain();
   }
 
-  public render = (camera: Camera): void => {
-    this.updateUniformBufferCamera(camera);
+  public render = (): void => {
+    //this.updateUniformBufferCamera(camera);
     this.encodeCommands();
   };
 
