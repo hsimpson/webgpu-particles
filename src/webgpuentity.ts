@@ -33,6 +33,15 @@ export default abstract class WebGPUEntity {
     this.updateModelMatrix();
   }
 
+  public get position(): vec3 {
+    return this._position;
+  }
+
+  public set position(newPos: vec3) {
+    this._position = newPos;
+    this.updateModelMatrix();
+  }
+
   private updateModelMatrix(): void {
     const translationMatrix = mat4.create();
     const rotationMatrix = mat4.create();

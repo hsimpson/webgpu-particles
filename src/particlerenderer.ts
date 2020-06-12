@@ -3,8 +3,8 @@ import './style.css';
 import WebGPURenderer from './webgpurenderer';
 import Camera from './camera';
 import ResizeObserver from 'resize-observer-polyfill';
-import { TriangleGeometry } from './trianglegeometry';
-import { BoxGeometry } from './boxgeometry';
+//import { TriangleGeometry } from './trianglegeometry';
+import { BoxGeometry, BoxDimensions } from './boxgeometry';
 import { CrossHairGeometry } from './crosshairgeometry';
 import WebGPUMesh from './webgpumesh';
 import { vec2 } from 'gl-matrix';
@@ -20,7 +20,7 @@ export default class ParticleRenderer {
   private _crossHairMesh: WebGPUMesh;
   /**/
 
-  /**/
+  /*/
   private _triangleMesh1: WebGPUMesh;
   private _triangleMesh2: WebGPUMesh;
   private _triangleMesh3: WebGPUMesh;
@@ -35,6 +35,8 @@ export default class ParticleRenderer {
 
   private _currentMousePos = vec2.create();
 
+  private readonly _movementSpeed = 0.25;
+
   public constructor() {
     this._canvas = document.getElementById('webgpu_canvas') as HTMLCanvasElement;
     this._canvas.width = this._canvas.offsetWidth * window.devicePixelRatio;
@@ -47,10 +49,6 @@ export default class ParticleRenderer {
     this._renderer = new WebGPURenderer(this._canvas, this._camera);
 
     const linePipeline = new WebGPURenderPipeline(this._camera, { primitiveTopology: 'line-list', sampleCount: 4 });
-    const trianglePipeline = new WebGPURenderPipeline(this._camera, {
-      primitiveTopology: 'triangle-list',
-      sampleCount: 4,
-    });
 
     /**/
     this._boxMesh = new WebGPUMesh(BoxGeometry, linePipeline);
@@ -60,7 +58,11 @@ export default class ParticleRenderer {
     this._renderer.addMesh(this._crossHairMesh);
     /**/
 
-    /**/
+    /*/
+    const trianglePipeline = new WebGPURenderPipeline(this._camera, {
+      primitiveTopology: 'triangle-list',
+      sampleCount: 4,
+    });
     this._triangleMesh1 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
     this._triangleMesh2 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
     this._triangleMesh3 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
@@ -100,6 +102,7 @@ export default class ParticleRenderer {
 
         this._canvas.addEventListener('wheel', this.onMouseWheel);
         this._canvas.addEventListener('mousemove', this.onMouseMove);
+        this._canvas.addEventListener('keydown', this.onKeyDown);
         this.render();
       },
       (error) => {
@@ -128,7 +131,7 @@ export default class ParticleRenderer {
       ).toFixed(2)}`;
     }
 
-    /**/
+    /*/
     this._triangleMesh1.rotateEuler(0, 0, duration * this._triangleRotation);
     this._triangleMesh2.rotateEuler(0, 0, duration * this._triangleRotation * -1.5);
     this._triangleMesh3.rotateEuler(0, 0, duration * this._triangleRotation * 2);
@@ -137,7 +140,7 @@ export default class ParticleRenderer {
 
     this._renderer.render();
 
-    requestAnimationFrame(this.render);
+    window.requestAnimationFrame(this.render);
   };
 
   private onMouseWheel = (event: WheelEvent): void => {
@@ -160,5 +163,53 @@ export default class ParticleRenderer {
       this._camera.rotateEuler(offset[1], 0.0, 0.0);
     }
     this._currentMousePos = currentPos;
+  };
+
+  private onKeyDown = (event: KeyboardEvent): void => {
+    const newPosition = this._crossHairMesh.position;
+    let x = newPosition[0];
+    let y = newPosition[1];
+    let z = newPosition[2];
+
+    switch (event.key) {
+      case 'a':
+        x -= this._movementSpeed;
+        break;
+      case 'd':
+        x += this._movementSpeed;
+        break;
+      case 'w':
+        z -= this._movementSpeed;
+        break;
+      case 's':
+        z += this._movementSpeed;
+        break;
+      case 'PageUp':
+        y += this._movementSpeed;
+        break;
+      case 'PageDown':
+        y -= this._movementSpeed;
+        break;
+
+      default:
+        break;
+    }
+
+    const epsilon = 0.001;
+    const halfx = BoxDimensions[0] / 2 + epsilon;
+    const halfy = BoxDimensions[1] / 2 + epsilon;
+    const halfz = BoxDimensions[2] / 2 + epsilon;
+
+    if (x < -halfx || x > halfx) {
+      x = this._crossHairMesh.position[0];
+    }
+    if (y < -halfy || y > halfy) {
+      y = this._crossHairMesh.position[1];
+    }
+    if (z < -halfz || z > halfz) {
+      z = this._crossHairMesh.position[2];
+    }
+
+    this._crossHairMesh.position = [x, y, z];
   };
 }
