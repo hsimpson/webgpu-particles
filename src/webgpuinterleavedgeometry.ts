@@ -23,6 +23,7 @@ export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
     if (this._initialized) {
       return;
     }
+    this._initialized = true;
 
     this._vertexBuffers.push(createBuffer(context.device, this._interleavedArray, GPUBufferUsage.VERTEX));
 
@@ -36,7 +37,5 @@ export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
       indexFormat: 'uint16', // does matter if non-indexed?
       vertexBuffers: [vertexBufferDesc],
     };
-
-    this._initialized = true;
   }
 }

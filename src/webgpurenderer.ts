@@ -7,6 +7,10 @@ import Camera from './camera';
 import WebGPURenderContext from './webgpurendercontext';
 import WebGPUMesh from './webgpumesh';
 
+interface WebGPURendererOptions {
+  sampleCount?: number;
+}
+
 export default class WebGPURenderer {
   private _canvas: HTMLCanvasElement;
   private _adapter: GPUAdapter;
@@ -24,13 +28,18 @@ export default class WebGPURenderer {
   private readonly _colorTextureFormat: GPUTextureFormat = 'bgra8unorm';
   private readonly _depthTextureFormat: GPUTextureFormat = 'depth24plus-stencil8';
 
-  private readonly _sampleCount = 4;
-
   private _camera: Camera;
 
-  public constructor(canvas: HTMLCanvasElement, camera: Camera) {
+  private _options: WebGPURendererOptions;
+
+  public constructor(canvas: HTMLCanvasElement, camera: Camera, settings?: WebGPURendererOptions) {
     this._canvas = canvas;
     this._camera = camera;
+    const defaultOptions: WebGPURendererOptions = {
+      sampleCount: 1,
+    };
+
+    this._options = { ...defaultOptions, ...settings };
   }
 
   private async initialize(): Promise<void> {
@@ -69,7 +78,7 @@ export default class WebGPURenderer {
       size: textureSize,
       //arrayLayerCount: 1, // FIXME: possible move to GPUTextureViewDescriptor?!
       mipLevelCount: 1,
-      sampleCount: this._sampleCount,
+      sampleCount: this._options.sampleCount,
       dimension: '2d',
       format: this._depthTextureFormat,
       usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
@@ -80,7 +89,7 @@ export default class WebGPURenderer {
 
     const colorTextureDesc: GPUTextureDescriptor = {
       size: textureSize,
-      sampleCount: this._sampleCount,
+      sampleCount: this._options.sampleCount,
       format: this._colorTextureFormat,
       usage: GPUTextureUsage.OUTPUT_ATTACHMENT,
     };
@@ -96,7 +105,7 @@ export default class WebGPURenderer {
       storeOp: 'store',
     };
 
-    if (this._sampleCount > 1) {
+    if (this._options.sampleCount > 1) {
       colorAttachment.attachment = this._colorTextureView;
       colorAttachment.resolveTarget = this._swapchain.getCurrentTexture().createView();
     } else {

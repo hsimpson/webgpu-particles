@@ -40,7 +40,7 @@ export const colorArray = new Float32Array([
 const indicesArray = new Uint16Array([0, 1, 2]);
 
 /**/
-export const geometry = new WebGPUInterleavedGeometry();
+const geometry = new WebGPUInterleavedGeometry();
 geometry.setVertices(vertexArray, 7 * Float32Array.BYTES_PER_ELEMENT);
 geometry.setIndices(indicesArray);
 geometry.addAttribute({ shaderLocation: 0, offset: 0, format: 'float3' });
@@ -48,7 +48,7 @@ geometry.addAttribute({ shaderLocation: 1, offset: 3 * Float32Array.BYTES_PER_EL
 /**/
 
 /*/
-export const geometry = new WebGPUGeometry(3);
+const geometry = new WebGPUGeometry(3);
 geometry.setIndices(indicesArray);
 geometry.addAttribute({
   array: positionArray,

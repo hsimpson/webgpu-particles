@@ -23,6 +23,8 @@ export default class WebGPUMesh extends WebGPUEntity {
     if (this._initialized) {
       return;
     }
+    this._initialized = true;
+
     this._geometry.initalize(context);
     await this._pipeline.initalize(context, this._geometry.vertexState);
 
@@ -40,8 +42,6 @@ export default class WebGPUMesh extends WebGPUEntity {
         },
       ],
     });
-
-    this._initialized = true;
   }
 
   public updateUniformBuffer(context: WebGPURenderContext): void {

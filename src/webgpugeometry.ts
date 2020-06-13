@@ -25,6 +25,7 @@ export default class WebGPUGeometry extends WebGPUGeometryBase {
     if (this._initialized) {
       return;
     }
+    this._initialized = true;
 
     const layoutDescriptors: GPUVertexBufferLayoutDescriptor[] = [];
     for (const attibute of this._attributes) {
@@ -41,7 +42,5 @@ export default class WebGPUGeometry extends WebGPUGeometryBase {
       indexFormat: 'uint16', // does matter if non-indexed?
       vertexBuffers: layoutDescriptors,
     };
-
-    this._initialized = true;
   }
 }

@@ -1,10 +1,10 @@
 import './style.css';
-//import ParticelRenderer from './particelrenderer';
 import WebGPURenderer from './webgpurenderer';
 import Camera from './camera';
 import ResizeObserver from 'resize-observer-polyfill';
 //import { TriangleGeometry } from './trianglegeometry';
 import { BoxGeometry, BoxDimensions } from './boxgeometry';
+import { ParticleGeometry } from './particlegeometry';
 import { CrossHairGeometry } from './crosshairgeometry';
 import WebGPUMesh from './webgpumesh';
 import { vec2 } from 'gl-matrix';
@@ -14,10 +14,12 @@ export default class ParticleRenderer {
   private _canvas: HTMLCanvasElement;
   private _renderer: WebGPURenderer;
   private _camera: Camera;
+  private readonly _sampleCount = 4;
 
   /**/
   private _boxMesh: WebGPUMesh;
   private _crossHairMesh: WebGPUMesh;
+  private _particleMesh: WebGPUMesh;
   /**/
 
   /*/
@@ -46,22 +48,38 @@ export default class ParticleRenderer {
     this._camera.position = [0, 0, 10];
     this._camera.updateMatrices();
 
-    this._renderer = new WebGPURenderer(this._canvas, this._camera);
+    this._renderer = new WebGPURenderer(this._canvas, this._camera, { sampleCount: this._sampleCount });
 
-    const linePipeline = new WebGPURenderPipeline(this._camera, { primitiveTopology: 'line-list', sampleCount: 4 });
+    const linePipeline = new WebGPURenderPipeline(this._camera, {
+      primitiveTopology: 'line-list',
+      sampleCount: this._sampleCount,
+      vertexShaderUrl: 'basic.vert.spv',
+      fragmentShaderUrl: 'basic.frag.spv',
+    });
+
+    const pointPipeline = new WebGPURenderPipeline(this._camera, {
+      primitiveTopology: 'point-list',
+      sampleCount: this._sampleCount,
+      vertexShaderUrl: 'particle.vert.spv',
+      fragmentShaderUrl: 'particle.frag.spv',
+    });
 
     /**/
     this._boxMesh = new WebGPUMesh(BoxGeometry, linePipeline);
     this._crossHairMesh = new WebGPUMesh(CrossHairGeometry, linePipeline);
+    this._particleMesh = new WebGPUMesh(ParticleGeometry, pointPipeline);
 
     this._renderer.addMesh(this._boxMesh);
     this._renderer.addMesh(this._crossHairMesh);
+    this._renderer.addMesh(this._particleMesh);
     /**/
 
     /*/
     const trianglePipeline = new WebGPURenderPipeline(this._camera, {
       primitiveTopology: 'triangle-list',
-      sampleCount: 4,
+      sampleCount: this._sampleCount,
+      vertexShaderUrl: 'basic.vert.spv',
+      fragmentShaderUrl: 'basic.frag.spv',
     });
     this._triangleMesh1 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
     this._triangleMesh2 = new WebGPUMesh(TriangleGeometry, trianglePipeline);

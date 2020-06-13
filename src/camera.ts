@@ -33,6 +33,8 @@ export default class Camera {
     if (this._initialized) {
       return;
     }
+    this._initialized = true;
+
     this._queue = context.queue;
 
     const uboArray = new Float32Array([...this._viewMatrix, ...this._perspectiveMatrix]);
@@ -63,8 +65,6 @@ export default class Camera {
         },
       ],
     });
-
-    this._initialized = true;
   }
 
   public get viewMatrix(): mat4 {
