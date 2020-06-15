@@ -1,0 +1,85 @@
+#version 450
+
+//layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform ComputeParams {
+  vec4  vHalfBounding;
+  vec4  vForcePos;
+  float fDeltaTime;
+  float fGravity;
+  float fForce;
+  float fForceOn;
+}
+params;
+
+layout(std140, set = 0, binding = 1) buffer ParticlesA {
+  vec4 pos[];
+}
+positions;
+
+layout(std140, set = 0, binding = 2) buffer ParticlesB {
+  vec4 vel[];
+}
+velocities;
+
+//vec3 v3BB_half = vec3(4.0, 2.5, 2.5);
+
+void main() {
+  uint index = gl_GlobalInvocationID.x;
+
+  vec3 position = positions.pos[index].xyz;
+  //vec3 position = positions.pos[index];
+  vec3 velocity = velocities.vel[index].xyz;
+
+  // Update Particle positions
+  position += velocity * params.fDeltaTime;
+
+  // Add in fGravity
+  velocity.y -= params.fGravity * params.fDeltaTime;
+
+  vec3 v3BB_half = params.vHalfBounding.xyz - 0.0001;
+
+  // Edge Collision Detection
+  if (position.x < -v3BB_half.x) {  // LEFT
+    position.x = -2.0 * v3BB_half.x - position.x;
+    velocity.x *= -0.9;
+  } else if (position.x > v3BB_half.x) {  // RIGHT
+    position.x = 2.0 * v3BB_half.x - position.x;
+    velocity.x *= -0.9;
+  }
+
+  if (position.y < -v3BB_half.y) {  // BOTTOM
+    position.y = -2.0 * v3BB_half.y - position.y;
+    velocity.y *= -0.45;  // if its on the bottom we extra dampen
+    velocity.x *= 0.9;
+  } else if (position.y > v3BB_half.y) {  // TOP
+    position.y = 2.0 * v3BB_half.y - position.y;
+    velocity.y *= -0.9;
+  }
+
+  if (position.z < -v3BB_half.z) {  // FRONT
+    position.z = -2.0 * v3BB_half.z - position.z;
+    velocity.z *= -0.9;
+  } else if (position.z > v3BB_half.z) {  // BACK
+    position.z = 2.0 * v3BB_half.z - position.z;
+    velocity.z *= -0.9;
+  }
+
+  // include force
+  uint uiForce = uint(params.fForceOn);
+  if (uiForce != 0u) {
+    vec3  d    = params.vForcePos.xyz - position;
+    float dist = sqrt(d.x * d.x + d.y * d.y + d.z * d.z);
+    if (dist < 1.0) {
+      dist = 1.0;  // This line prevents anything that is really close from
+                   // getting a huge force
+    }
+
+    //velocity += d / dist * params.fForce / dist;
+    velocity += d / dist * (params.fForce * params.fDeltaTime);
+  }
+
+  // write back
+  positions.pos[index].xyz  = position;
+  velocities.vel[index].xyz = velocity;
+}

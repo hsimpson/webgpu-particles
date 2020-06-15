@@ -1,6 +1,7 @@
+import WebGPUObjectBase from './webgpuobjectbase';
 import { mat4, vec3, quat } from 'gl-matrix';
 
-export default abstract class WebGPUEntity {
+export default abstract class WebGPUEntity extends WebGPUObjectBase {
   private _modelMatrix = mat4.create();
   private _position = vec3.create();
   private _scale: vec3 = [1.0, 1.0, 1.0];

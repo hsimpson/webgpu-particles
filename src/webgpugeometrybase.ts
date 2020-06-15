@@ -1,7 +1,8 @@
+import WebGPUObjectBase from './webgpuobjectbase';
 import WebGPURenderContext from './webgpurendercontext';
 import { createBuffer } from './webgpuhelpers';
 
-export default abstract class WebGPUGeometryBase {
+export default abstract class WebGPUGeometryBase extends WebGPUObjectBase {
   private _indicesArray: Uint16Array;
   private _indexBuffer: GPUBuffer;
   protected _vertexBuffers: GPUBuffer[] = [];
@@ -44,5 +45,9 @@ export default abstract class WebGPUGeometryBase {
 
   public get vertexBuffers(): GPUBuffer[] {
     return this._vertexBuffers;
+  }
+
+  public set vertexBuffers(buffers: GPUBuffer[]) {
+    this._vertexBuffers = buffers;
   }
 }

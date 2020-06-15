@@ -63,10 +63,4 @@ export default class WebGPUMesh extends WebGPUEntity {
   public get gpuPipeline(): GPURenderPipeline {
     return this._pipeline.gpuPipeline;
   }
-
-  /*
-  public get uniformBuffer(): GPUBuffer {
-    return this._uniformBuffer;
-  }
-  */
 }

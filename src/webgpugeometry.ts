@@ -6,6 +6,7 @@ interface GeometryAttribute {
   array: Float32Array;
   descriptor: GPUVertexAttributeDescriptor;
   stride: number;
+  usage?: GPUBufferUsageFlags;
 }
 
 export default class WebGPUGeometry extends WebGPUGeometryBase {
@@ -28,12 +29,15 @@ export default class WebGPUGeometry extends WebGPUGeometryBase {
     this._initialized = true;
 
     const layoutDescriptors: GPUVertexBufferLayoutDescriptor[] = [];
-    for (const attibute of this._attributes) {
-      this._vertexBuffers.push(createBuffer(context.device, attibute.array, GPUBufferUsage.VERTEX));
+    for (let i = 0; i < this._attributes.length; i++) {
+      const attribute = this._attributes[i];
+      const buffer = createBuffer(context.device, attribute.array, attribute.usage || GPUBufferUsage.VERTEX);
+      buffer.label = `Buffer-${this.name}-Attribute-${i}`;
+      this._vertexBuffers.push(buffer);
 
       layoutDescriptors.push({
-        attributes: [attibute.descriptor],
-        arrayStride: attibute.stride,
+        attributes: [attribute.descriptor],
+        arrayStride: attribute.stride,
         stepMode: 'vertex',
       });
     }

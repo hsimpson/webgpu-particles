@@ -4,11 +4,12 @@ import Camera from './camera';
 import ResizeObserver from 'resize-observer-polyfill';
 //import { TriangleGeometry } from './trianglegeometry';
 import { BoxGeometry, BoxDimensions } from './boxgeometry';
-import { ParticleGeometry } from './particlegeometry';
 import { CrossHairGeometry } from './crosshairgeometry';
+import { ParticleGeometry, NumOffParticles } from './particlegeometry';
 import WebGPUMesh from './webgpumesh';
 import { vec2 } from 'gl-matrix';
 import WebGPURenderPipeline from './webgpurenderpipeline';
+import WebGPUComputePipline from './webgpucomputepipline';
 
 export default class ParticleRenderer {
   private _canvas: HTMLCanvasElement;
@@ -39,13 +40,16 @@ export default class ParticleRenderer {
 
   private readonly _movementSpeed = 0.25;
 
+  private _computePipeLine: WebGPUComputePipline;
+
   public constructor() {
     this._canvas = document.getElementById('webgpu_canvas') as HTMLCanvasElement;
     this._canvas.width = this._canvas.offsetWidth * window.devicePixelRatio;
     this._canvas.height = this._canvas.offsetHeight * window.devicePixelRatio;
 
     this._camera = new Camera(45, this._canvas.width / this._canvas.height, 0.1, 1000);
-    this._camera.position = [0, 0, 10];
+    this._camera.position = [0, 0, 15];
+    //this._camera.position = [10, 5, 15];
     this._camera.updateMatrices();
 
     this._renderer = new WebGPURenderer(this._canvas, this._camera, { sampleCount: this._sampleCount });
@@ -68,11 +72,20 @@ export default class ParticleRenderer {
     this._boxMesh = new WebGPUMesh(BoxGeometry, linePipeline);
     this._crossHairMesh = new WebGPUMesh(CrossHairGeometry, linePipeline);
     this._particleMesh = new WebGPUMesh(ParticleGeometry, pointPipeline);
+    this._particleMesh.name = 'ParticleMesh';
 
     this._renderer.addMesh(this._boxMesh);
     this._renderer.addMesh(this._crossHairMesh);
     this._renderer.addMesh(this._particleMesh);
     /**/
+
+    this._computePipeLine = new WebGPUComputePipline(this._particleMesh, {
+      computeShaderUrl: 'particle.comp.spv',
+      particleCount: NumOffParticles,
+    });
+    this._computePipeLine.name = 'ComputePipeLine';
+
+    this._renderer.setComputePipeLine(this._computePipeLine);
 
     /*/
     const trianglePipeline = new WebGPURenderPipeline(this._camera, {
@@ -121,6 +134,8 @@ export default class ParticleRenderer {
         this._canvas.addEventListener('wheel', this.onMouseWheel);
         this._canvas.addEventListener('mousemove', this.onMouseMove);
         this._canvas.addEventListener('keydown', this.onKeyDown);
+        this._canvas.addEventListener('keyup', this.onKeyup);
+        this._currentTime = performance.now();
         this.render();
       },
       (error) => {
@@ -156,7 +171,7 @@ export default class ParticleRenderer {
     this._triangleMesh4.rotateEuler(0, 0, duration * this._triangleRotation * -2.5);
     /**/
 
-    this._renderer.render();
+    this._renderer.render(duration);
 
     window.requestAnimationFrame(this.render);
   };
@@ -209,6 +224,11 @@ export default class ParticleRenderer {
         y -= this._movementSpeed;
         break;
 
+      case ' ':
+        this._computePipeLine.turnForceOn();
+        return;
+        break;
+
       default:
         break;
     }
@@ -229,5 +249,17 @@ export default class ParticleRenderer {
     }
 
     this._crossHairMesh.position = [x, y, z];
+    this._computePipeLine.forcePostion = [x, y, z];
+  };
+
+  private onKeyup = (event: KeyboardEvent): void => {
+    switch (event.key) {
+      case ' ':
+        this._computePipeLine.turnForceOff();
+        break;
+
+      default:
+        break;
+    }
   };
 }

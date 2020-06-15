@@ -1,14 +1,15 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../node_modules/@webgpu/types/dist/index.d.ts" />
 
-//import { mat4 } from 'gl-matrix';
-//import { createBuffer } from './webgpuhelpers';
 import Camera from './camera';
 import WebGPURenderContext from './webgpurendercontext';
 import WebGPUMesh from './webgpumesh';
+import WebGPUComputePipline from './webgpucomputepipline';
 
 interface WebGPURendererOptions {
   sampleCount?: number;
+  colorFormat?: GPUTextureFormat;
+  depthFormat?: GPUTextureFormat;
 }
 
 export default class WebGPURenderer {
@@ -25,18 +26,19 @@ export default class WebGPURenderer {
   private _colorTextureView: GPUTextureView;
   private _depthTextureView: GPUTextureView;
 
-  private readonly _colorTextureFormat: GPUTextureFormat = 'bgra8unorm';
-  private readonly _depthTextureFormat: GPUTextureFormat = 'depth24plus-stencil8';
-
   private _camera: Camera;
 
   private _options: WebGPURendererOptions;
+
+  private _computePipeLine: WebGPUComputePipline;
 
   public constructor(canvas: HTMLCanvasElement, camera: Camera, settings?: WebGPURendererOptions) {
     this._canvas = canvas;
     this._camera = camera;
     const defaultOptions: WebGPURendererOptions = {
       sampleCount: 1,
+      colorFormat: 'bgra8unorm',
+      depthFormat: 'depth24plus-stencil8',
     };
 
     this._options = { ...defaultOptions, ...settings };
@@ -62,7 +64,7 @@ export default class WebGPURenderer {
       const context: GPUCanvasContext = (this._canvas.getContext('gpupresent') as unknown) as GPUCanvasContext;
       const swapChainDesc: GPUSwapChainDescriptor = {
         device: this._device,
-        format: this._colorTextureFormat,
+        format: this._options.colorFormat,
         usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
       };
       this._swapchain = context.configureSwapChain(swapChainDesc);
@@ -80,7 +82,7 @@ export default class WebGPURenderer {
       mipLevelCount: 1,
       sampleCount: this._options.sampleCount,
       dimension: '2d',
-      format: this._depthTextureFormat,
+      format: this._options.depthFormat,
       usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
     };
 
@@ -90,7 +92,7 @@ export default class WebGPURenderer {
     const colorTextureDesc: GPUTextureDescriptor = {
       size: textureSize,
       sampleCount: this._options.sampleCount,
-      format: this._colorTextureFormat,
+      format: this._options.colorFormat,
       usage: GPUTextureUsage.OUTPUT_ATTACHMENT,
     };
 
@@ -98,7 +100,30 @@ export default class WebGPURenderer {
     this._colorTextureView = colorTexture.createView();
   }
 
-  private encodeCommands(): void {
+  private async initializeResources(): Promise<void> {
+    const uniformBindGroupLayoutMesh = this._context.device.createBindGroupLayout({
+      entries: [
+        {
+          binding: 0,
+          visibility: GPUShaderStage.VERTEX,
+          type: 'uniform-buffer',
+        },
+      ],
+    });
+
+    this._camera.initalize(this._context);
+
+    const meshInitializers: Promise<void>[] = [];
+    for (const mesh of this._meshes) {
+      meshInitializers.push(mesh.initalize(this._context, uniformBindGroupLayoutMesh));
+    }
+
+    await Promise.all(meshInitializers);
+
+    await this._computePipeLine.initialize(this._context);
+  }
+
+  private encodeCommands(deltaTime: number): void {
     const colorAttachment: GPURenderPassColorAttachmentDescriptor = {
       attachment: null,
       loadValue: { r: 0, g: 0, b: 0, a: 1 },
@@ -127,61 +152,60 @@ export default class WebGPURenderer {
 
     const commandEncoder = this._device.createCommandEncoder();
 
-    const passEncoder = commandEncoder.beginRenderPass(renderPassDesc);
-    passEncoder.setViewport(0, 0, this._canvas.width, this._canvas.height, 0, 1);
-    passEncoder.setScissorRect(0, 0, this._canvas.width, this._canvas.height);
-
-    passEncoder.setBindGroup(0, this._camera.bindGroup);
-
-    for (const mesh of this._meshes) {
-      passEncoder.setPipeline(mesh.gpuPipeline);
-      const geometry = mesh.geometry;
-      mesh.updateUniformBuffer(this._context);
-
-      passEncoder.setBindGroup(1, mesh.uniformBindGroup);
-
-      for (let i = 0; i < geometry.vertexBuffers.length; i++) {
-        passEncoder.setVertexBuffer(i, geometry.vertexBuffers[i]);
-      }
-      if (geometry.indexCount > 0) {
-        passEncoder.setIndexBuffer(geometry.indexBuffer);
-        passEncoder.drawIndexed(geometry.indexCount, 1, 0, 0, 0);
-      } else {
-        passEncoder.draw(geometry.vertexCount, 1, 0, 0);
-      }
+    // Compute pass
+    /**/
+    {
+      this._computePipeLine.deltaTime(deltaTime);
+      const passEncoder = commandEncoder.beginComputePass();
+      passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
+      passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
+      passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
+      //passEncoder.dispatch(this._computePipeLine.particleCount);
+      passEncoder.endPass();
     }
-    passEncoder.endPass();
+    /**/
+
+    // Render pass
+    {
+      const passEncoder = commandEncoder.beginRenderPass(renderPassDesc);
+      passEncoder.setViewport(0, 0, this._canvas.width, this._canvas.height, 0, 1);
+      passEncoder.setScissorRect(0, 0, this._canvas.width, this._canvas.height);
+
+      passEncoder.setBindGroup(0, this._camera.bindGroup);
+
+      /**/
+      for (const mesh of this._meshes) {
+        passEncoder.setPipeline(mesh.gpuPipeline);
+        const geometry = mesh.geometry;
+        mesh.updateUniformBuffer(this._context);
+
+        passEncoder.setBindGroup(1, mesh.uniformBindGroup);
+
+        for (let i = 0; i < geometry.vertexBuffers.length; i++) {
+          passEncoder.setVertexBuffer(i, geometry.vertexBuffers[i]);
+        }
+        if (geometry.indexCount > 0) {
+          passEncoder.setIndexBuffer(geometry.indexBuffer);
+          passEncoder.drawIndexed(geometry.indexCount, 1, 0, 0, 0);
+        } else {
+          passEncoder.draw(geometry.vertexCount, 1, 0, 0);
+        }
+      }
+      /**/
+      passEncoder.endPass();
+    }
+
     this._queue.submit([commandEncoder.finish()]);
-  }
 
-  private async initializeResources(): Promise<void> {
-    const uniformBindGroupLayoutMesh = this._context.device.createBindGroupLayout({
-      entries: [
-        {
-          binding: 0,
-          visibility: GPUShaderStage.VERTEX,
-          type: 'uniform-buffer',
-        },
-      ],
-    });
-
-    this._camera.initalize(this._context);
-
-    const meshInitializers: Promise<void>[] = [];
-    for (const mesh of this._meshes) {
-      meshInitializers.push(mesh.initalize(this._context, uniformBindGroupLayoutMesh));
-    }
-
-    await Promise.all(meshInitializers);
+    //this._computePipeLine.debugBuffer();
   }
 
   public resize(): void {
     this.reCreateSwapChain();
   }
 
-  public render = (): void => {
-    //this.updateUniformBufferCamera(camera);
-    this.encodeCommands();
+  public render = (deltaTime: number): void => {
+    this.encodeCommands(deltaTime);
   };
 
   public async start(): Promise<void> {
@@ -192,5 +216,9 @@ export default class WebGPURenderer {
 
   public addMesh(mesh: WebGPUMesh): void {
     this._meshes.push(mesh);
+  }
+
+  public setComputePipeLine(pipeline: WebGPUComputePipline): void {
+    this._computePipeLine = pipeline;
   }
 }

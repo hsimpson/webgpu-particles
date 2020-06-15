@@ -2,36 +2,31 @@ import WebGPUGeometry from './webgpugeometry';
 import { BoxDimensions } from './boxgeometry';
 import { vec3 } from 'gl-matrix';
 
-const numOffParticles = 10000;
+export const NumOffParticles = 500_000;
+const numElements = 4;
+const positionArray = new Float32Array(NumOffParticles * numElements);
 
-const positionArray = new Float32Array(numOffParticles * 3);
-//const velocityArray = new Float32Array(numOffParticles * 3);
-//velocityArray.fill(0.0);
-
-const geometry = new WebGPUGeometry(numOffParticles);
+const geometry = new WebGPUGeometry(NumOffParticles);
+geometry.name = 'ParticleGeometry';
 geometry.addAttribute({
   array: positionArray,
-  stride: 3 * Float32Array.BYTES_PER_ELEMENT,
+  stride: numElements * Float32Array.BYTES_PER_ELEMENT,
   descriptor: { shaderLocation: 0, offset: 0, format: 'float3' },
+  usage: GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE,
 });
-/*
-geometry.addAttribute({
-  array: colorArray,
-  stride: 4 * Float32Array.BYTES_PER_ELEMENT,
-  descriptor: { shaderLocation: 1, offset: 0, format: 'float4' },
-});
-*/
 
 const randomVector = (): vec3 => {
   return [
     Math.random() * BoxDimensions[0] - BoxDimensions[0] / 2,
     Math.random() * BoxDimensions[1] - BoxDimensions[1] / 2,
+    //0,
     Math.random() * BoxDimensions[2] - BoxDimensions[2] / 2,
+    //1.0,
   ];
 };
 
 // fill with random data
-for (let i = 0; i < numOffParticles; i += 3) {
+for (let i = 0; i < NumOffParticles * numElements; i += numElements) {
   const randomPos = randomVector();
   positionArray.set(randomPos, i);
 }

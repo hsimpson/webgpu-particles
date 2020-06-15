@@ -1,5 +1,6 @@
 import WebGPURenderContext from './webgpurendercontext';
 import Camera from './camera';
+import WebGPUPipelineBase from './webgpupipelinebase';
 
 interface WebGPURenderPipelineOptions {
   primitiveTopology?: GPUPrimitiveTopology;
@@ -10,13 +11,12 @@ interface WebGPURenderPipelineOptions {
   fragmentShaderUrl?: string;
 }
 
-export default class WebGPURenderPipeline {
-  private _pipeline: GPURenderPipeline;
-  private _initialized = false;
+export default class WebGPURenderPipeline extends WebGPUPipelineBase {
   private _options: WebGPURenderPipelineOptions;
   private _camera: Camera;
 
   public constructor(camera: Camera, options: WebGPURenderPipelineOptions) {
+    super();
     this._camera = camera;
     const defaultOptions: WebGPURenderPipelineOptions = {
       primitiveTopology: 'triangle-list',
@@ -69,24 +69,13 @@ export default class WebGPURenderPipeline {
       ],
     });
 
-    const loadShader = async (path: string): Promise<GPUShaderModule> => {
-      const response = await fetch(path);
-      const buffer = await response.arrayBuffer();
-
-      const shaderModule = context.device.createShaderModule({
-        code: new Uint32Array(buffer),
-      });
-
-      return shaderModule;
-    };
-
     const vertexStage: GPUProgrammableStageDescriptor = {
-      module: await loadShader(this._options.vertexShaderUrl),
+      module: await this.loadShader(context, this._options.vertexShaderUrl),
       entryPoint: 'main',
     };
 
     const fragmentStage: GPUProgrammableStageDescriptor = {
-      module: await loadShader(this._options.fragmentShaderUrl),
+      module: await this.loadShader(context, this._options.fragmentShaderUrl),
       entryPoint: 'main',
     };
 
@@ -110,6 +99,6 @@ export default class WebGPURenderPipeline {
   }
 
   public get gpuPipeline(): GPURenderPipeline {
-    return this._pipeline;
+    return this._pipeline as GPURenderPipeline;
   }
 }
