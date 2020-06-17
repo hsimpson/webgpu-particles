@@ -4,6 +4,7 @@ body {
   padding: 0;
   vertical-align: baseline;
   background: #000000;
+  color: #ffffff;
   width: 100%;
   height: 100%;
   display: flex;
@@ -12,7 +13,12 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-#webgpu_canvas {
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+.webgpu_canvas {
   width: 100%;
   height: 100%;
   /*display: none;*/
@@ -20,15 +26,32 @@ body {
 
 #error {
   display: none;
-  color: #ffffff;
   font-size: 22px;
   font-weight: bold;
 }
 
-#frameinfo {
+.stats {
   position: absolute;
   left: 0;
   top: 0;
-  color: #fff;
   padding: 10px;
+}
+
+.gui {
+  position: absolute;
+  left: 0;
+  top: 100px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.slider {
+  padding: 5px;
+}
+
+.slider input {
+  width: 100%;
 }

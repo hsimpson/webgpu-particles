@@ -3,16 +3,16 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 
 const commonConfig: webpack.Configuration = {
-  entry: './src/index.ts',
+  entry: './src/index.tsx',
 
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.tsx', '.jsx', '.js'],
   },
 
   module: {
     rules: [
       {
-        test: /\.ts?$/,
+        test: /\.ts(x?)$/,
         use: ['ts-loader'],
       },
       {

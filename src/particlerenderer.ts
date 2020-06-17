@@ -1,15 +1,16 @@
-import './style.css';
 import WebGPURenderer from './webgpurenderer';
 import Camera from './camera';
 import ResizeObserver from 'resize-observer-polyfill';
 //import { TriangleGeometry } from './trianglegeometry';
 import { BoxGeometry, BoxDimensions } from './boxgeometry';
 import { CrossHairGeometry } from './crosshairgeometry';
-import { ParticleGeometry, NumOffParticles } from './particlegeometry';
+import ParticleGeometry from './particlegeometry';
 import WebGPUMesh from './webgpumesh';
 import { vec2 } from 'gl-matrix';
 import WebGPURenderPipeline from './webgpurenderpipeline';
 import WebGPUComputePipline from './webgpucomputepipline';
+
+type FrameCallBackT = (frameTime: number) => void;
 
 export default class ParticleRenderer {
   private _canvas: HTMLCanvasElement;
@@ -34,16 +35,17 @@ export default class ParticleRenderer {
   private _currentTime = 0;
   private _frameCount = 0;
   private _durationAvg = 0;
-  private _frameTimeEl: HTMLElement;
 
   private _currentMousePos = vec2.create();
 
   private readonly _movementSpeed = 0.25;
 
   private _computePipeLine: WebGPUComputePipline;
+  private _frameTimeCallback: FrameCallBackT;
 
-  public constructor() {
-    this._canvas = document.getElementById('webgpu_canvas') as HTMLCanvasElement;
+  public constructor(canvas: HTMLCanvasElement, particleCount: number, frameTimeCallback?: FrameCallBackT) {
+    this._canvas = canvas;
+    this._frameTimeCallback = frameTimeCallback;
     this._canvas.width = this._canvas.offsetWidth * window.devicePixelRatio;
     this._canvas.height = this._canvas.offsetHeight * window.devicePixelRatio;
 
@@ -71,7 +73,7 @@ export default class ParticleRenderer {
     /**/
     this._boxMesh = new WebGPUMesh(BoxGeometry, linePipeline);
     this._crossHairMesh = new WebGPUMesh(CrossHairGeometry, linePipeline);
-    this._particleMesh = new WebGPUMesh(ParticleGeometry, pointPipeline);
+    this._particleMesh = new WebGPUMesh(new ParticleGeometry(particleCount, 4), pointPipeline);
     this._particleMesh.name = 'ParticleMesh';
 
     this._renderer.addMesh(this._boxMesh);
@@ -81,7 +83,7 @@ export default class ParticleRenderer {
 
     this._computePipeLine = new WebGPUComputePipline(this._particleMesh, {
       computeShaderUrl: 'particle.comp.spv',
-      particleCount: NumOffParticles,
+      particleCount: particleCount,
     });
     this._computePipeLine.name = 'ComputePipeLine';
 
@@ -108,8 +110,6 @@ export default class ParticleRenderer {
     this._renderer.addMesh(this._triangleMesh3);
     this._renderer.addMesh(this._triangleMesh4);
     /**/
-
-    this._frameTimeEl = document.getElementById('frameinfo');
   }
 
   public start(): void {
@@ -149,19 +149,26 @@ export default class ParticleRenderer {
   }
 
   private render = (): void => {
-    this._frameCount++;
     const now = performance.now();
     const duration = now - this._currentTime;
-    this._durationAvg += duration;
     this._currentTime = now;
 
-    if (this._durationAvg > 1000) {
-      const avgFrameTime = this._durationAvg / this._frameCount;
-      this._frameCount = 0;
-      this._durationAvg = 0;
-      this._frameTimeEl.innerHTML = `Avg frame time: ${avgFrameTime.toFixed(3)} ms<br>FPS: ${(
-        1000 / avgFrameTime
-      ).toFixed(2)}`;
+    if (this._frameTimeCallback) {
+      this._frameCount++;
+
+      this._durationAvg += duration;
+
+      if (this._durationAvg > 1000) {
+        const avgFrameTime = this._durationAvg / this._frameCount;
+        this._frameCount = 0;
+        this._durationAvg = 0;
+        this._frameTimeCallback(avgFrameTime);
+        /*
+        this._frameTimeEl.innerHTML = `Avg frame time: ${avgFrameTime.toFixed(3)} ms<br>FPS: ${(
+          1000 / avgFrameTime
+        ).toFixed(2)}`;
+        */
+      }
     }
 
     /*/
@@ -262,4 +269,8 @@ export default class ParticleRenderer {
         break;
     }
   };
+
+  public get computePipline(): WebGPUComputePipline {
+    return this._computePipeLine;
+  }
 }

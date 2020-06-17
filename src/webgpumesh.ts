@@ -56,6 +56,10 @@ export default class WebGPUMesh extends WebGPUEntity {
     return this._geometry;
   }
 
+  public set geometry(geometry: WebGPUInterleavedGeometry | WebGPUGeometry) {
+    this._geometry = geometry;
+  }
+
   public get uniformBindGroup(): GPUBindGroup {
     return this._uniformBindGroup;
   }

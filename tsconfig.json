@@ -3,6 +3,7 @@
     "downlevelIteration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
     "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,

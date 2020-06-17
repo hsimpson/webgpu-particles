@@ -4,6 +4,7 @@ import WebGPUMesh from './webgpumesh';
 import { createBuffer } from './webgpuhelpers';
 import { BoxDimensions } from './boxgeometry';
 import { vec3, vec4 } from 'gl-matrix';
+import ParticleGeometry from './particlegeometry';
 
 interface WebGPUComputePiplineOptions {
   computeShaderUrl: string;
@@ -21,9 +22,11 @@ interface ComputeParams {
 
 export default class WebGPUComputePipline extends WebGPUPipelineBase {
   private _options: WebGPUComputePiplineOptions;
+  private _bindGroupLayout: GPUBindGroupLayout;
   private _bindGroup: GPUBindGroup;
 
   private _computeParamsUniformBuffer: GPUBuffer;
+  private _computeParamsUniformBufferSize = 0;
   private _posBuffer: GPUBuffer;
   private _velBuffer: GPUBuffer;
 
@@ -31,7 +34,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
 
   private _drawMesh: WebGPUMesh;
 
-  private _queue: GPUQueue;
+  private _context: WebGPURenderContext;
 
   public constructor(drawMesh: WebGPUMesh, options: WebGPUComputePiplineOptions) {
     super();
@@ -59,13 +62,14 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
     }
     this._initialized = true;
 
-    this._queue = context.queue;
+    this._context = context;
 
     const velArray = new Float32Array(this._options.particleCount * 4);
 
     this._posBuffer = this._drawMesh.geometry.vertexBuffers[0];
 
     const uniformArray = this.getParamsArray();
+    this._computeParamsUniformBufferSize = uniformArray.byteLength;
     this._computeParamsUniformBuffer = createBuffer(
       context.device,
       uniformArray,
@@ -74,12 +78,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
 
     this._velBuffer = createBuffer(context.device, velArray, GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE);
 
-    const computeStage: GPUProgrammableStageDescriptor = {
-      module: await this.loadShader(context, this._options.computeShaderUrl),
-      entryPoint: 'main',
-    };
-
-    const uniformBindGroupLayout = context.device.createBindGroupLayout({
+    this._bindGroupLayout = context.device.createBindGroupLayout({
       entries: [
         {
           binding: 0,
@@ -99,15 +98,19 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
       ],
     });
 
-    this._bindGroup = context.device.createBindGroup({
-      layout: uniformBindGroupLayout,
+    await this.createBindGroup();
+  }
+
+  private async createBindGroup(): Promise<void> {
+    this._bindGroup = this._context.device.createBindGroup({
+      layout: this._bindGroupLayout,
       entries: [
         {
           binding: 0,
           resource: {
             buffer: this._computeParamsUniformBuffer,
             offset: 0,
-            size: uniformArray.byteLength,
+            size: this._computeParamsUniformBufferSize,
           },
         },
         {
@@ -115,7 +118,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
           resource: {
             buffer: this._posBuffer,
             offset: 0,
-            size: velArray.byteLength,
+            size: this._options.particleCount * 4 * 4,
           },
         },
         {
@@ -123,23 +126,28 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
           resource: {
             buffer: this._velBuffer,
             offset: 0,
-            size: velArray.byteLength,
+            size: this._options.particleCount * 4 * 4,
           },
         },
       ],
     });
     this._bindGroup.label = `${this.name}-BindGroup`;
 
-    const layout = context.device.createPipelineLayout({
-      bindGroupLayouts: [uniformBindGroupLayout],
+    const layout = this._context.device.createPipelineLayout({
+      bindGroupLayouts: [this._bindGroupLayout],
     });
+
+    const computeStage: GPUProgrammableStageDescriptor = {
+      module: await this.loadShader(this._context, this._options.computeShaderUrl),
+      entryPoint: 'main',
+    };
 
     const pipelineDesc: GPUComputePipelineDescriptor = {
       layout,
       computeStage,
     };
 
-    this._pipeline = context.device.createComputePipeline(pipelineDesc);
+    this._pipeline = this._context.device.createComputePipeline(pipelineDesc);
   }
 
   private getParamsArray(): Float32Array {
@@ -159,7 +167,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
   private updateUniformBuffer(): void {
     if (this._initialized) {
       const uniformArray = this.getParamsArray();
-      this._queue.writeBuffer(this._computeParamsUniformBuffer, 0, uniformArray.buffer);
+      this._context.queue.writeBuffer(this._computeParamsUniformBuffer, 0, uniformArray.buffer);
     }
   }
 
@@ -173,6 +181,20 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
 
   public get particleCount(): number {
     return this._options.particleCount;
+  }
+
+  public async updateParticleCount(count: number): Promise<void> {
+    if (count !== this._options.particleCount) {
+      if (count <= 0) {
+        count = 1;
+      }
+      this._options.particleCount = count;
+
+      this._drawMesh.geometry = new ParticleGeometry(this._options.particleCount, 4);
+      this._drawMesh.geometry.initalize(this._context);
+      this._initialized = false;
+      await this.initialize(this._context);
+    }
   }
 
   public turnForceOn(): void {
@@ -192,6 +214,16 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
 
   public set forcePostion(pos: vec3) {
     this._computeParams.vForcePos = [pos[0], pos[1], pos[2], 1.0];
+    this.updateUniformBuffer();
+  }
+
+  public set force(force: number) {
+    this._computeParams.fForce = force;
+    this.updateUniformBuffer();
+  }
+
+  public set gravity(gravity: number) {
+    this._computeParams.fGravity = gravity;
     this.updateUniformBuffer();
   }
 }
