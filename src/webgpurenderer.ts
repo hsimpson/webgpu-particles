@@ -101,26 +101,18 @@ export default class WebGPURenderer {
   }
 
   private async initializeResources(): Promise<void> {
-    const uniformBindGroupLayoutMesh = this._context.device.createBindGroupLayout({
-      entries: [
-        {
-          binding: 0,
-          visibility: GPUShaderStage.VERTEX,
-          type: 'uniform-buffer',
-        },
-      ],
-    });
-
     this._camera.initalize(this._context);
 
     const meshInitializers: Promise<void>[] = [];
     for (const mesh of this._meshes) {
-      meshInitializers.push(mesh.initalize(this._context, uniformBindGroupLayoutMesh));
+      meshInitializers.push(mesh.initalize(this._context, this._camera));
     }
 
     await Promise.all(meshInitializers);
 
-    await this._computePipeLine.initialize(this._context);
+    if (this._computePipeLine) {
+      await this._computePipeLine.initialize(this._context);
+    }
   }
 
   private encodeCommands(deltaTime: number): void {
@@ -154,7 +146,7 @@ export default class WebGPURenderer {
 
     // Compute pass
     /**/
-    {
+    if (this._computePipeLine) {
       this._computePipeLine.deltaTime(deltaTime);
       const passEncoder = commandEncoder.beginComputePass();
       passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
@@ -171,15 +163,13 @@ export default class WebGPURenderer {
       passEncoder.setViewport(0, 0, this._canvas.width, this._canvas.height, 0, 1);
       passEncoder.setScissorRect(0, 0, this._canvas.width, this._canvas.height);
 
-      passEncoder.setBindGroup(0, this._camera.bindGroup);
-
       /**/
       for (const mesh of this._meshes) {
         passEncoder.setPipeline(mesh.gpuPipeline);
         const geometry = mesh.geometry;
         mesh.updateUniformBuffer(this._context);
 
-        passEncoder.setBindGroup(1, mesh.uniformBindGroup);
+        passEncoder.setBindGroup(0, mesh.bindGroup);
 
         for (let i = 0; i < geometry.vertexBuffers.length; i++) {
           passEncoder.setVertexBuffer(i, geometry.vertexBuffers[i]);

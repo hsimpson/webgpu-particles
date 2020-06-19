@@ -1,5 +1,4 @@
 import WebGPURenderContext from './webgpurendercontext';
-import Camera from './camera';
 import WebGPUPipelineBase from './webgpupipelinebase';
 
 interface WebGPURenderPipelineOptions {
@@ -13,11 +12,10 @@ interface WebGPURenderPipelineOptions {
 
 export default class WebGPURenderPipeline extends WebGPUPipelineBase {
   private _options: WebGPURenderPipelineOptions;
-  private _camera: Camera;
+  private _bindGroup: GPUBindGroup;
 
-  public constructor(camera: Camera, options: WebGPURenderPipelineOptions) {
+  public constructor(options: WebGPURenderPipelineOptions) {
     super();
-    this._camera = camera;
     const defaultOptions: WebGPURenderPipelineOptions = {
       primitiveTopology: 'triangle-list',
       sampleCount: 1,
@@ -27,7 +25,12 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     this._options = { ...defaultOptions, ...options };
   }
 
-  public async initalize(context: WebGPURenderContext, vertexState: GPUVertexStateDescriptor): Promise<void> {
+  public async initalize(
+    context: WebGPURenderContext,
+    vertexState: GPUVertexStateDescriptor,
+    bindGroupLayoutEntries: GPUBindGroupLayoutEntry[],
+    bindGroupEntries: GPUBindGroupEntry[]
+  ): Promise<void> {
     if (this._initialized) {
       return;
     }
@@ -59,16 +62,6 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
       cullMode: 'none',
     };
 
-    const uniformBindGroupLayoutMesh = context.device.createBindGroupLayout({
-      entries: [
-        {
-          binding: 0,
-          visibility: GPUShaderStage.VERTEX,
-          type: 'uniform-buffer',
-        },
-      ],
-    });
-
     const vertexStage: GPUProgrammableStageDescriptor = {
       module: await this.loadShader(context, this._options.vertexShaderUrl),
       entryPoint: 'main',
@@ -79,8 +72,17 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
       entryPoint: 'main',
     };
 
+    const bindGroupLayout = context.device.createBindGroupLayout({
+      entries: bindGroupLayoutEntries,
+    });
+
+    this._bindGroup = context.device.createBindGroup({
+      layout: bindGroupLayout,
+      entries: bindGroupEntries,
+    });
+
     const layout = context.device.createPipelineLayout({
-      bindGroupLayouts: [this._camera.bindGroupLayout, uniformBindGroupLayoutMesh],
+      bindGroupLayouts: [bindGroupLayout],
     });
 
     const pipelineDesc: GPURenderPipelineDescriptor = {
@@ -100,5 +102,9 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
 
   public get gpuPipeline(): GPURenderPipeline {
     return this._pipeline as GPURenderPipeline;
+  }
+
+  public get bindGroup(): GPUBindGroup {
+    return this._bindGroup;
   }
 }

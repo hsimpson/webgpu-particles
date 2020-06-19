@@ -9,6 +9,7 @@ import WebGPUMesh from './webgpumesh';
 import { vec2 } from 'gl-matrix';
 import WebGPURenderPipeline from './webgpurenderpipeline';
 import WebGPUComputePipline from './webgpucomputepipline';
+import WebGPUMaterial from './webgpumaterial';
 
 type FrameCallBackT = (frameTime: number) => void;
 
@@ -43,6 +44,8 @@ export default class ParticleRenderer {
   private _computePipeLine: WebGPUComputePipline;
   private _frameTimeCallback: FrameCallBackT;
 
+  private _particleMaterial: WebGPUMaterial;
+
   public constructor(canvas: HTMLCanvasElement, particleCount: number, frameTimeCallback?: FrameCallBackT) {
     this._canvas = canvas;
     this._frameTimeCallback = frameTimeCallback;
@@ -56,24 +59,28 @@ export default class ParticleRenderer {
 
     this._renderer = new WebGPURenderer(this._canvas, this._camera, { sampleCount: this._sampleCount });
 
-    const linePipeline = new WebGPURenderPipeline(this._camera, {
+    const linePipeline = new WebGPURenderPipeline({
       primitiveTopology: 'line-list',
       sampleCount: this._sampleCount,
       vertexShaderUrl: 'basic.vert.spv',
       fragmentShaderUrl: 'basic.frag.spv',
     });
+    linePipeline.name = 'Line pipeline';
 
-    const pointPipeline = new WebGPURenderPipeline(this._camera, {
+    const pointPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'point-list',
       sampleCount: this._sampleCount,
       vertexShaderUrl: 'particle.vert.spv',
       fragmentShaderUrl: 'particle.frag.spv',
     });
+    pointPipeline.name = 'Point pipeline';
 
     /**/
     this._boxMesh = new WebGPUMesh(BoxGeometry, linePipeline);
     this._crossHairMesh = new WebGPUMesh(CrossHairGeometry, linePipeline);
-    this._particleMesh = new WebGPUMesh(new ParticleGeometry(particleCount, 4), pointPipeline);
+
+    this._particleMaterial = new WebGPUMaterial([1.0, 0.0, 1.0, 0.5]);
+    this._particleMesh = new WebGPUMesh(new ParticleGeometry(particleCount, 4), pointPipeline, this._particleMaterial);
     this._particleMesh.name = 'ParticleMesh';
 
     this._renderer.addMesh(this._boxMesh);
@@ -85,7 +92,7 @@ export default class ParticleRenderer {
       computeShaderUrl: 'particle.comp.spv',
       particleCount: particleCount,
     });
-    this._computePipeLine.name = 'ComputePipeLine';
+    this._computePipeLine.name = 'Compute pipeLine';
 
     this._renderer.setComputePipeLine(this._computePipeLine);
 

@@ -7,9 +7,11 @@ export default class Camera {
   private _viewMatrix = mat4.create();
   private _rotation = quat.create();
 
-  private _uniformBufferCamera: GPUBuffer;
+  private _uniformBuffer: GPUBuffer;
+  /*
   private _uniformBindGroupLayout: GPUBindGroupLayout;
   private _uniformBindGroup: GPUBindGroup;
+  */
   private _initialized = false;
   private _queue: GPUQueue;
 
@@ -38,12 +40,9 @@ export default class Camera {
     this._queue = context.queue;
 
     const uboArray = new Float32Array([...this._viewMatrix, ...this._perspectiveMatrix]);
-    this._uniformBufferCamera = createBuffer(
-      context.device,
-      uboArray,
-      GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-    );
+    this._uniformBuffer = createBuffer(context.device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
 
+    /*
     this._uniformBindGroupLayout = context.device.createBindGroupLayout({
       entries: [
         {
@@ -65,6 +64,7 @@ export default class Camera {
         },
       ],
     });
+    */
   }
 
   public get viewMatrix(): mat4 {
@@ -73,6 +73,10 @@ export default class Camera {
 
   public get perspectiveMatrix(): mat4 {
     return this._perspectiveMatrix;
+  }
+
+  public get uniformBuffer(): GPUBuffer {
+    return this._uniformBuffer;
   }
 
   public updateMatrices(): void {
@@ -106,7 +110,7 @@ export default class Camera {
   private updateUniformBufferCamera(): void {
     if (this._initialized) {
       const uboArray = new Float32Array([...this._viewMatrix, ...this._perspectiveMatrix]);
-      this._queue.writeBuffer(this._uniformBufferCamera, 0, uboArray.buffer);
+      this._queue.writeBuffer(this._uniformBuffer, 0, uboArray.buffer);
     }
   }
 
@@ -121,6 +125,7 @@ export default class Camera {
     this.rotateQuat(tempQuat);
   }
 
+  /*
   public get bindGroup(): GPUBindGroup {
     return this._uniformBindGroup;
   }
@@ -128,4 +133,5 @@ export default class Camera {
   public get bindGroupLayout(): GPUBindGroupLayout {
     return this._uniformBindGroupLayout;
   }
+  */
 }

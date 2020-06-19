@@ -5,7 +5,7 @@ layout(set = 0, binding = 0) uniform UBOCamera {
   mat4 projMatrix;
 };
 
-layout(set = 1, binding = 0) uniform UBOModel {
+layout(set = 0, binding = 1) uniform UBOModel {
   mat4 modelMatrix;
 };
 
