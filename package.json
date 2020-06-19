@@ -23,6 +23,7 @@
     "@types/gl-matrix": "^2.4.5",
     "@types/node": "^14.0.13",
     "@types/react": "^16.9.36",
+    "@types/react-color": "^3.0.2",
     "@types/react-dom": "^16.9.8",
     "@types/recoil": "0.0.1",
     "@types/webpack": "^4.41.17",
@@ -53,6 +54,7 @@
   "dependencies": {
     "gl-matrix": "^3.3.0",
     "react": "^16.13.1",
+    "react-color": "^2.18.1",
     "react-dom": "^16.13.1",
     "recoil": "0.0.8",
     "resize-observer-polyfill": "^1.5.1"

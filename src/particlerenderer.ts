@@ -140,8 +140,8 @@ export default class ParticleRenderer {
 
         this._canvas.addEventListener('wheel', this.onMouseWheel);
         this._canvas.addEventListener('mousemove', this.onMouseMove);
-        this._canvas.addEventListener('keydown', this.onKeyDown);
-        this._canvas.addEventListener('keyup', this.onKeyup);
+        document.addEventListener('keydown', this.onKeyDown);
+        document.addEventListener('keyup', this.onKeyup);
         this._currentTime = performance.now();
         this.render();
       },
@@ -279,5 +279,9 @@ export default class ParticleRenderer {
 
   public get computePipline(): WebGPUComputePipline {
     return this._computePipeLine;
+  }
+
+  public get particleMaterial(): WebGPUMaterial {
+    return this._particleMaterial;
   }
 }

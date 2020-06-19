@@ -1,10 +1,22 @@
 import React from 'react';
 import Slider from './Slider';
+import { ChromePicker, ColorResult } from 'react-color';
 import ComputeState from './state';
 import { useRecoilState } from 'recoil';
 
 const Gui = (): React.ReactElement => {
   const [guiState, setGuiState] = useRecoilState(ComputeState);
+
+  const onColorChange = (colorResult: ColorResult): void => {
+    const color = {
+      r: colorResult.rgb.r,
+      g: colorResult.rgb.g,
+      b: colorResult.rgb.b,
+      a: colorResult.rgb.a || 1.0,
+    };
+
+    setGuiState({ ...guiState, color: color });
+  };
 
   return (
     <div className="gui">
@@ -35,6 +47,7 @@ const Gui = (): React.ReactElement => {
           setGuiState({ ...guiState, force });
         }}
         labelText={`Force: ${guiState.force.toFixed(2)}`}></Slider>
+      <ChromePicker color={guiState.color} onChange={onColorChange}></ChromePicker>
     </div>
   );
 };

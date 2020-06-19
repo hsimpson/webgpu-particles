@@ -25,6 +25,12 @@ const Renderer = (): React.ReactElement => {
     if (particlerenderer.current) {
       particlerenderer.current.computePipline.force = guiState.force;
       particlerenderer.current.computePipline.gravity = guiState.gravity;
+      particlerenderer.current.particleMaterial.color = [
+        guiState.color.r / 255,
+        guiState.color.g / 255,
+        guiState.color.b / 255,
+        guiState.color.a,
+      ];
 
       (async () => {
         await particlerenderer.current.computePipline.updateParticleCount(guiState.particleCount);
