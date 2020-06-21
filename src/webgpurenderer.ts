@@ -5,6 +5,7 @@ import Camera from './camera';
 import WebGPURenderContext from './webgpurendercontext';
 import WebGPUMesh from './webgpumesh';
 import WebGPUComputePipline from './webgpucomputepipline';
+import { BlockquoteHTMLAttributes } from 'react';
 
 interface WebGPURendererOptions {
   sampleCount?: number;
@@ -42,6 +43,13 @@ export default class WebGPURenderer {
     };
 
     this._options = { ...defaultOptions, ...settings };
+  }
+
+  public static supportsWebGPU(): boolean {
+    if (navigator.gpu) {
+      return true;
+    }
+    return false;
   }
 
   private async initialize(): Promise<void> {

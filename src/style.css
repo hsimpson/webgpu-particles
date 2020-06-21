@@ -24,10 +24,11 @@ body {
   /*display: none;*/
 }
 
-#error {
-  display: none;
+.error {
+  color: #ff0000;
   font-size: 22px;
   font-weight: bold;
+  padding: 20px;
 }
 
 .stats {
