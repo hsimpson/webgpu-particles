@@ -2,7 +2,7 @@ import React from 'react';
 import Slider from './Slider';
 import { ChromePicker, ColorResult } from 'react-color';
 import ComputeState from './state';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useResetRecoilState } from 'recoil';
 
 const Gui = (): React.ReactElement => {
   const [guiState, setGuiState] = useRecoilState(ComputeState);
@@ -48,6 +48,7 @@ const Gui = (): React.ReactElement => {
         }}
         labelText={`Force: ${guiState.force.toFixed(2)}`}></Slider>
       <ChromePicker color={guiState.color} onChange={onColorChange}></ChromePicker>
+      <button onClick={useResetRecoilState(ComputeState)}>Reset to default values</button>
     </div>
   );
 };

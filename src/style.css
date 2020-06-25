@@ -49,6 +49,14 @@ body {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+.gui > .chrome-picker {
+  margin: 5px;
+}
+
+.gui > button {
+  margin: 5px;
+}
+
 .slider {
   padding: 5px;
 }
