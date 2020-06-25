@@ -11,7 +11,7 @@ import WebGPURenderPipeline from './webgpurenderpipeline';
 import WebGPUComputePipline from './webgpucomputepipline';
 import WebGPUMaterial from './webgpumaterial';
 
-type FrameCallBackT = (frameTime: number) => void;
+type FrameCallBackT = (frameTime: number, cpuTime: number) => void;
 
 export default class ParticleRenderer {
   private _canvas: HTMLCanvasElement;
@@ -35,7 +35,8 @@ export default class ParticleRenderer {
 
   private _currentTime = 0;
   private _frameCount = 0;
-  private _durationAvg = 0;
+  private _frameDurationAvg = 0;
+  private _cpuDurationAvg = 0;
 
   private _currentMousePos = vec2.create();
 
@@ -163,20 +164,22 @@ export default class ParticleRenderer {
   }
 
   private render = (): void => {
-    const now = performance.now();
-    const duration = now - this._currentTime;
-    this._currentTime = now;
+    const beginFrameTime = performance.now();
+    const duration = beginFrameTime - this._currentTime;
+    this._currentTime = beginFrameTime;
 
     if (this._frameTimeCallback) {
       this._frameCount++;
 
-      this._durationAvg += duration;
+      this._frameDurationAvg += duration;
 
-      if (this._durationAvg > 1000) {
-        const avgFrameTime = this._durationAvg / this._frameCount;
+      if (this._frameDurationAvg > 1000) {
+        const avgFrameTime = this._frameDurationAvg / this._frameCount;
+        const avgCpuTime = this._cpuDurationAvg / this._frameCount;
         this._frameCount = 0;
-        this._durationAvg = 0;
-        this._frameTimeCallback(avgFrameTime);
+        this._frameDurationAvg = 0;
+        this._cpuDurationAvg = 0;
+        this._frameTimeCallback(avgFrameTime, avgCpuTime);
         /*
         this._frameTimeEl.innerHTML = `Avg frame time: ${avgFrameTime.toFixed(3)} ms<br>FPS: ${(
           1000 / avgFrameTime
@@ -195,6 +198,8 @@ export default class ParticleRenderer {
     this._renderer.render(duration);
 
     window.requestAnimationFrame(this.render);
+    const endFrameTime = performance.now();
+    this._cpuDurationAvg += endFrameTime - beginFrameTime;
   };
 
   private onMouseWheel = (event: WheelEvent): void => {

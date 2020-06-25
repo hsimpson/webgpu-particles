@@ -5,15 +5,26 @@ import Gui from './Gui';
 import ComputeState from './state';
 import { useRecoilState } from 'recoil';
 
+interface FrameStats {
+  frameTime: number;
+  cpuTime: number;
+}
+
 const Renderer = (): React.ReactElement => {
   const canvasEl = React.useRef<HTMLCanvasElement>(undefined);
-  const [frameTimeState, setFrameTimeState] = React.useState<number>(0);
+  const [frameStats, setFrameStats] = React.useState<FrameStats>({
+    frameTime: 0,
+    cpuTime: 0,
+  });
   const [guiState] = useRecoilState(ComputeState);
 
   const particlerenderer = React.useRef<Particlerenderer>(undefined);
 
-  const onFrameTimeChanged = (frameTime: number): void => {
-    setFrameTimeState(frameTime);
+  const onFrameTimeChanged = (frameTime: number, cpuTime): void => {
+    setFrameStats({
+      frameTime,
+      cpuTime,
+    });
   };
 
   React.useEffect(() => {
@@ -41,7 +52,7 @@ const Renderer = (): React.ReactElement => {
   return (
     <React.Fragment>
       <canvas className="webgpu_canvas" ref={canvasEl} tabIndex={1}></canvas>
-      <Stats frameTime={frameTimeState}></Stats>
+      <Stats frameTime={frameStats.frameTime} cpuTime={frameStats.cpuTime}></Stats>
       <Gui></Gui>
     </React.Fragment>
   );

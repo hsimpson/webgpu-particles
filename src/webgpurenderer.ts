@@ -25,6 +25,8 @@ export default class WebGPURenderer {
 
   private _colorTextureView: GPUTextureView;
   private _depthTextureView: GPUTextureView;
+  private _colorAttachment: GPURenderPassColorAttachmentDescriptor;
+  private _depthAttachment: GPURenderPassDepthStencilAttachmentDescriptor;
 
   private _camera: Camera;
 
@@ -103,6 +105,20 @@ export default class WebGPURenderer {
 
     const colorTexture = this._device.createTexture(colorTextureDesc);
     this._colorTextureView = colorTexture.createView();
+
+    this._colorAttachment = {
+      attachment: null,
+      loadValue: { r: 0, g: 0, b: 0, a: 1 },
+      storeOp: 'store',
+    };
+
+    this._depthAttachment = {
+      attachment: this._depthTextureView,
+      depthLoadValue: 1,
+      depthStoreOp: 'store',
+      stencilLoadValue: 'load',
+      stencilStoreOp: 'store',
+    };
   }
 
   private async initializeResources(): Promise<void> {
@@ -121,30 +137,16 @@ export default class WebGPURenderer {
   }
 
   private encodeCommands(deltaTime: number): void {
-    const colorAttachment: GPURenderPassColorAttachmentDescriptor = {
-      attachment: null,
-      loadValue: { r: 0, g: 0, b: 0, a: 1 },
-      storeOp: 'store',
-    };
-
     if (this._options.sampleCount > 1) {
-      colorAttachment.attachment = this._colorTextureView;
-      colorAttachment.resolveTarget = this._swapchain.getCurrentTexture().createView();
+      this._colorAttachment.attachment = this._colorTextureView;
+      this._colorAttachment.resolveTarget = this._swapchain.getCurrentTexture().createView();
     } else {
-      colorAttachment.attachment = this._swapchain.getCurrentTexture().createView();
+      this._colorAttachment.attachment = this._swapchain.getCurrentTexture().createView();
     }
 
-    const depthAttachment: GPURenderPassDepthStencilAttachmentDescriptor = {
-      attachment: this._depthTextureView,
-      depthLoadValue: 1,
-      depthStoreOp: 'store',
-      stencilLoadValue: 'load',
-      stencilStoreOp: 'store',
-    };
-
     const renderPassDesc: GPURenderPassDescriptor = {
-      colorAttachments: [colorAttachment],
-      depthStencilAttachment: depthAttachment,
+      colorAttachments: [this._colorAttachment],
+      depthStencilAttachment: this._depthAttachment,
     };
 
     const commandEncoder = this._device.createCommandEncoder();
@@ -157,7 +159,6 @@ export default class WebGPURenderer {
       passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
       passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
       passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
-      //passEncoder.dispatch(this._computePipeLine.particleCount);
       passEncoder.endPass();
     }
     /**/
@@ -165,8 +166,8 @@ export default class WebGPURenderer {
     // Render pass
     {
       const passEncoder = commandEncoder.beginRenderPass(renderPassDesc);
-      passEncoder.setViewport(0, 0, this._canvas.width, this._canvas.height, 0, 1);
-      passEncoder.setScissorRect(0, 0, this._canvas.width, this._canvas.height);
+      //passEncoder.setViewport(0, 0, this._canvas.width, this._canvas.height, 0, 1);
+      //passEncoder.setScissorRect(0, 0, this._canvas.width, this._canvas.height);
 
       /**/
       for (const mesh of this._meshes) {
@@ -190,8 +191,6 @@ export default class WebGPURenderer {
     }
 
     this._queue.submit([commandEncoder.finish()]);
-
-    //this._computePipeLine.debugBuffer();
   }
 
   public resize(): void {

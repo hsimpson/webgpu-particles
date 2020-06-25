@@ -208,6 +208,8 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
   }
 
   public deltaTime(deltaTime: number): void {
+    // because deltaTime is in ms and the compute shader calculation wants a fraction of a second
+    // divide by 1000 is needed
     this._computeParams.fDeltaTime = deltaTime / 1000;
     this.updateUniformBuffer();
   }
