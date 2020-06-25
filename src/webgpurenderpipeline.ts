@@ -95,6 +95,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
       vertexState,
       rasterizationState,
       sampleCount: this._options.sampleCount,
+      // alphaToCoverageEnabled: true, // not yet supported
     };
 
     this._pipeline = context.device.createRenderPipeline(pipelineDesc);

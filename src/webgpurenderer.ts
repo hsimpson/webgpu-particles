@@ -5,7 +5,6 @@ import Camera from './camera';
 import WebGPURenderContext from './webgpurendercontext';
 import WebGPUMesh from './webgpumesh';
 import WebGPUComputePipline from './webgpucomputepipline';
-import { BlockquoteHTMLAttributes } from 'react';
 
 interface WebGPURendererOptions {
   sampleCount?: number;
@@ -65,19 +64,17 @@ export default class WebGPURenderer {
     this._queue = this._device.defaultQueue;
 
     this._context = new WebGPURenderContext(this._canvas, this._device, this._queue);
+
+    const context: GPUCanvasContext = (this._canvas.getContext('gpupresent') as unknown) as GPUCanvasContext;
+    const swapChainDesc: GPUSwapChainDescriptor = {
+      device: this._device,
+      format: this._options.colorFormat,
+      usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+    };
+    this._swapchain = context.configureSwapChain(swapChainDesc);
   }
 
   private reCreateSwapChain(): void {
-    if (!this._swapchain) {
-      const context: GPUCanvasContext = (this._canvas.getContext('gpupresent') as unknown) as GPUCanvasContext;
-      const swapChainDesc: GPUSwapChainDescriptor = {
-        device: this._device,
-        format: this._options.colorFormat,
-        usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-      };
-      this._swapchain = context.configureSwapChain(swapChainDesc);
-    }
-
     const textureSize: GPUExtent3D = {
       width: this._canvas.width,
       height: this._canvas.height,
@@ -173,9 +170,9 @@ export default class WebGPURenderer {
 
       /**/
       for (const mesh of this._meshes) {
-        passEncoder.setPipeline(mesh.gpuPipeline);
         const geometry = mesh.geometry;
-        mesh.updateUniformBuffer(this._context);
+        passEncoder.setPipeline(mesh.gpuPipeline);
+        mesh.updateUniformBuffer();
 
         passEncoder.setBindGroup(0, mesh.bindGroup);
 

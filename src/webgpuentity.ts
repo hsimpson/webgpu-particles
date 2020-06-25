@@ -7,8 +7,6 @@ export default abstract class WebGPUEntity extends WebGPUObjectBase {
   private _scale: vec3 = [1.0, 1.0, 1.0];
   private _rotation = quat.create();
 
-  public needsUpdate = false;
-
   public get modelMatrix(): mat4 {
     return this._modelMatrix;
   }
@@ -43,7 +41,7 @@ export default abstract class WebGPUEntity extends WebGPUObjectBase {
     this.updateModelMatrix();
   }
 
-  private updateModelMatrix(): void {
+  protected updateModelMatrix(): void {
     const translationMatrix = mat4.create();
     const rotationMatrix = mat4.create();
     const scaleMatrix = mat4.create();
@@ -55,6 +53,5 @@ export default abstract class WebGPUEntity extends WebGPUObjectBase {
 
     mat4.multiply(tempMat, translationMatrix, rotationMatrix);
     this._modelMatrix = mat4.multiply(this._modelMatrix, tempMat, scaleMatrix);
-    this.needsUpdate = true;
   }
 }

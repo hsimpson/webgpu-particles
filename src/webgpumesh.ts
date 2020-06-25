@@ -16,6 +16,8 @@ export default class WebGPUMesh extends WebGPUEntity {
 
   private _material: WebGPUMaterial;
 
+  private _context: WebGPURenderContext;
+
   public constructor(
     geometry: WebGPUInterleavedGeometry | WebGPUGeometry,
     pipeline: WebGPURenderPipeline,
@@ -32,6 +34,7 @@ export default class WebGPUMesh extends WebGPUEntity {
       return;
     }
     this._initialized = true;
+    this._context = context;
 
     if (this._material) {
       this._material.initalize(context);
@@ -78,12 +81,17 @@ export default class WebGPUMesh extends WebGPUEntity {
     await this._pipeline.initalize(context, this._geometry.vertexState, bindGroupLayoutEntries, bindGroupEntries);
   }
 
-  public updateUniformBuffer(context: WebGPURenderContext): void {
-    if (this.needsUpdate) {
+  public updateUniformBuffer(): void {
+    if (this._context) {
       const uboArray = new Float32Array([...this.modelMatrix]);
-      context.queue.writeBuffer(this._uniformBuffer, 0, uboArray.buffer);
-      this.needsUpdate = false;
+      //console.log(uboArray);
+      this._context.queue.writeBuffer(this._uniformBuffer, 0, uboArray.buffer);
     }
+  }
+
+  protected updateModelMatrix(): void {
+    super.updateModelMatrix();
+    this.updateUniformBuffer();
   }
 
   public get geometry(): WebGPUInterleavedGeometry | WebGPUGeometry {

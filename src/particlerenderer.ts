@@ -59,13 +59,21 @@ export default class ParticleRenderer {
 
     this._renderer = new WebGPURenderer(this._canvas, this._camera, { sampleCount: this._sampleCount });
 
-    const linePipeline = new WebGPURenderPipeline({
+    const boxPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'line-list',
       sampleCount: this._sampleCount,
       vertexShaderUrl: 'basic.vert.spv',
       fragmentShaderUrl: 'basic.frag.spv',
     });
-    linePipeline.name = 'Line pipeline';
+    boxPipeline.name = 'boxPipeline';
+
+    const crossHairPipeline = new WebGPURenderPipeline({
+      primitiveTopology: 'line-list',
+      sampleCount: this._sampleCount,
+      vertexShaderUrl: 'basic.vert.spv',
+      fragmentShaderUrl: 'basic.frag.spv',
+    });
+    crossHairPipeline.name = 'crossHairPipeline';
 
     const pointPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'point-list',
@@ -73,11 +81,13 @@ export default class ParticleRenderer {
       vertexShaderUrl: 'particle.vert.spv',
       fragmentShaderUrl: 'particle.frag.spv',
     });
-    pointPipeline.name = 'Point pipeline';
+    pointPipeline.name = 'pointPipeline';
 
     /**/
-    this._boxMesh = new WebGPUMesh(BoxGeometry, linePipeline);
-    this._crossHairMesh = new WebGPUMesh(CrossHairGeometry, linePipeline);
+    this._boxMesh = new WebGPUMesh(BoxGeometry, boxPipeline);
+    this._boxMesh.name = 'BoxMesh';
+    this._crossHairMesh = new WebGPUMesh(CrossHairGeometry, crossHairPipeline);
+    this._crossHairMesh.name = 'CrossHairMesh';
 
     this._particleMaterial = new WebGPUMaterial([1.0, 0.0, 1.0, 0.5]);
     this._particleMesh = new WebGPUMesh(new ParticleGeometry(particleCount, 4), pointPipeline, this._particleMaterial);
@@ -148,9 +158,6 @@ export default class ParticleRenderer {
       (error) => {
         console.error(error);
         // no WebGPU support
-        this._canvas.style.display = 'none';
-        const errorEl = document.getElementById('error');
-        errorEl.style.display = 'block';
       }
     );
   }

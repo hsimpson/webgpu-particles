@@ -13,7 +13,7 @@ export default class Camera {
   private _uniformBindGroup: GPUBindGroup;
   */
   private _initialized = false;
-  private _queue: GPUQueue;
+  private _context: WebGPURenderContext;
 
   public position: vec3 = vec3.create();
   public target: vec3 = vec3.create();
@@ -37,34 +37,10 @@ export default class Camera {
     }
     this._initialized = true;
 
-    this._queue = context.queue;
+    this._context = context;
 
     const uboArray = new Float32Array([...this._viewMatrix, ...this._perspectiveMatrix]);
     this._uniformBuffer = createBuffer(context.device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
-
-    /*
-    this._uniformBindGroupLayout = context.device.createBindGroupLayout({
-      entries: [
-        {
-          binding: 0,
-          visibility: GPUShaderStage.VERTEX,
-          type: 'uniform-buffer',
-        },
-      ],
-    });
-
-    this._uniformBindGroup = context.device.createBindGroup({
-      layout: this._uniformBindGroupLayout,
-      entries: [
-        {
-          binding: 0,
-          resource: {
-            buffer: this._uniformBufferCamera,
-          },
-        },
-      ],
-    });
-    */
   }
 
   public get viewMatrix(): mat4 {
@@ -88,12 +64,11 @@ export default class Camera {
     const translationMatrix = mat4.create();
     const rotationMatrix = mat4.create();
 
-    //mat4.translate(translationMatrix, translationMatrix, this.position);
     mat4.lookAt(translationMatrix, this.position, this.target, this.up);
     mat4.fromQuat(rotationMatrix, this._rotation);
 
     this._viewMatrix = mat4.multiply(this._viewMatrix, translationMatrix, rotationMatrix);
-    this.updateUniformBufferCamera();
+    this.updateUniformBuffer();
   }
 
   private updatePerspectiveMatrix(): void {
@@ -104,13 +79,13 @@ export default class Camera {
       this.zNear,
       this.zFar
     );
-    this.updateUniformBufferCamera();
+    this.updateUniformBuffer();
   }
 
-  private updateUniformBufferCamera(): void {
+  private updateUniformBuffer(): void {
     if (this._initialized) {
       const uboArray = new Float32Array([...this._viewMatrix, ...this._perspectiveMatrix]);
-      this._queue.writeBuffer(this._uniformBuffer, 0, uboArray.buffer);
+      this._context.queue.writeBuffer(this._uniformBuffer, 0, uboArray.buffer);
     }
   }
 
@@ -124,14 +99,4 @@ export default class Camera {
     tempQuat = quat.fromEuler(tempQuat, angleX, angelY, angleZ);
     this.rotateQuat(tempQuat);
   }
-
-  /*
-  public get bindGroup(): GPUBindGroup {
-    return this._uniformBindGroup;
-  }
-
-  public get bindGroupLayout(): GPUBindGroupLayout {
-    return this._uniformBindGroupLayout;
-  }
-  */
 }
