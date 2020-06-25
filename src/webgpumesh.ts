@@ -81,10 +81,9 @@ export default class WebGPUMesh extends WebGPUEntity {
     await this._pipeline.initalize(context, this._geometry.vertexState, bindGroupLayoutEntries, bindGroupEntries);
   }
 
-  public updateUniformBuffer(): void {
+  private updateUniformBuffer(): void {
     if (this._context) {
       const uboArray = new Float32Array([...this.modelMatrix]);
-      //console.log(uboArray);
       this._context.queue.writeBuffer(this._uniformBuffer, 0, uboArray.buffer);
     }
   }

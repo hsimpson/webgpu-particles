@@ -172,7 +172,6 @@ export default class WebGPURenderer {
       for (const mesh of this._meshes) {
         const geometry = mesh.geometry;
         passEncoder.setPipeline(mesh.gpuPipeline);
-        mesh.updateUniformBuffer();
 
         passEncoder.setBindGroup(0, mesh.bindGroup);
 

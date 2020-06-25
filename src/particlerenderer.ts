@@ -248,10 +248,9 @@ export default class ParticleRenderer {
       case ' ':
         this._computePipeLine.turnForceOn();
         return;
-        break;
 
       default:
-        break;
+        return;
     }
 
     const epsilon = 0.001;
