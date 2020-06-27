@@ -1,11 +1,14 @@
 import React from 'react';
 import Slider from './Slider';
 import { ChromePicker, ColorResult } from 'react-color';
-import ComputeState from './state';
+import { ComputePropertiesAtom, ParticleCountAtom } from './state';
 import { useRecoilState, useResetRecoilState } from 'recoil';
 
 const Gui = (): React.ReactElement => {
-  const [guiState, setGuiState] = useRecoilState(ComputeState);
+  const [computePropertiesState, setComputePropertiesState] = useRecoilState(ComputePropertiesAtom);
+  const [particleCountState, setParticleCountState] = useRecoilState(ParticleCountAtom);
+  const resetComputeProperties = useResetRecoilState(ComputePropertiesAtom);
+  const resetParticleCount = useResetRecoilState(ParticleCountAtom);
 
   const onColorChange = (colorResult: ColorResult): void => {
     const color = {
@@ -15,40 +18,54 @@ const Gui = (): React.ReactElement => {
       a: colorResult.rgb.a || 1.0,
     };
 
-    setGuiState({ ...guiState, color: color });
+    setComputePropertiesState({ ...computePropertiesState, color: color });
+  };
+
+  const onReset = (): void => {
+    resetComputeProperties();
+    resetParticleCount();
   };
 
   return (
     <div className="gui">
       <Slider
         min={1}
-        max={5_000_000}
-        step={1000}
-        value={guiState.particleCount}
+        max={10_100_000}
+        step={100_000}
+        value={particleCountState}
         onValueChange={(particleCount: number) => {
-          setGuiState({ ...guiState, particleCount });
+          setParticleCountState(particleCount);
         }}
-        labelText={`Particle count: ${guiState.particleCount.toLocaleString()}`}></Slider>
+        labelText={`Particle count: ${particleCountState.toLocaleString()}`}></Slider>
+      <Slider
+        min={30}
+        max={1000}
+        step={10}
+        value={computePropertiesState.refreshRate}
+        onValueChange={(refreshRate: number) => {
+          setComputePropertiesState({ ...computePropertiesState, refreshRate });
+        }}
+        labelText={`Compute refresh rate: ${computePropertiesState.refreshRate} Hz`}></Slider>
       <Slider
         min={-20}
         max={20}
         step={0.01}
-        value={guiState.gravity}
+        value={computePropertiesState.gravity}
         onValueChange={(gravity: number) => {
-          setGuiState({ ...guiState, gravity });
+          setComputePropertiesState({ ...computePropertiesState, gravity });
         }}
-        labelText={`Gravity: ${guiState.gravity.toFixed(2)}`}></Slider>
+        labelText={`Gravity: ${computePropertiesState.gravity.toFixed(2)}`}></Slider>
       <Slider
         min={-50}
         max={50}
         step={0.01}
-        value={guiState.force}
+        value={computePropertiesState.force}
         onValueChange={(force: number) => {
-          setGuiState({ ...guiState, force });
+          setComputePropertiesState({ ...computePropertiesState, force });
         }}
-        labelText={`Force: ${guiState.force.toFixed(2)}`}></Slider>
-      <ChromePicker color={guiState.color} onChange={onColorChange}></ChromePicker>
-      <button onClick={useResetRecoilState(ComputeState)}>Reset to default values</button>
+        labelText={`Force: ${computePropertiesState.force.toFixed(2)}`}></Slider>
+      <ChromePicker color={computePropertiesState.color} onChange={onColorChange}></ChromePicker>
+      <button onClick={onReset}>Reset to default values</button>
     </div>
   );
 };

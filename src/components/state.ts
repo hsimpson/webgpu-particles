@@ -1,11 +1,11 @@
 import { atom } from 'recoil';
 
-const ComputeState = atom({
-  key: 'compute',
+export const ComputePropertiesAtom = atom({
+  key: 'computePropertiesAtom',
   default: {
-    particleCount: 100_000,
     gravity: 9.81,
     force: 20,
+    refreshRate: 60,
     color: {
       r: 255,
       g: 0,
@@ -15,4 +15,7 @@ const ComputeState = atom({
   },
 });
 
-export default ComputeState;
+export const ParticleCountAtom = atom({
+  key: 'particleCountAtom',
+  default: 100_000,
+});

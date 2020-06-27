@@ -33,6 +33,8 @@ export default class WebGPURenderer {
   private _options: WebGPURendererOptions;
 
   private _computePipeLine: WebGPUComputePipline;
+  private _computeDeltaTime = 0;
+  private _computeRefreshTime = 1000 / 60;
 
   public constructor(canvas: HTMLCanvasElement, camera: Camera, settings?: WebGPURendererOptions) {
     this._canvas = canvas;
@@ -151,17 +153,22 @@ export default class WebGPURenderer {
 
     const commandEncoder = this._device.createCommandEncoder();
 
-    // Compute pass
-    /**/
-    if (this._computePipeLine) {
-      this._computePipeLine.deltaTime(deltaTime);
-      const passEncoder = commandEncoder.beginComputePass();
-      passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
-      passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
-      passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
-      passEncoder.endPass();
+    this._computeDeltaTime += deltaTime;
+
+    if (this._computeDeltaTime >= this._computeRefreshTime) {
+      // Compute pass
+      /**/
+      if (this._computePipeLine) {
+        this._computePipeLine.deltaTime(this._computeDeltaTime);
+        const passEncoder = commandEncoder.beginComputePass();
+        passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
+        passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
+        passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
+        passEncoder.endPass();
+        this._computeDeltaTime = 0;
+      }
+      /**/
     }
-    /**/
 
     // Render pass
     {
@@ -213,5 +220,9 @@ export default class WebGPURenderer {
 
   public setComputePipeLine(pipeline: WebGPUComputePipline): void {
     this._computePipeLine = pipeline;
+  }
+
+  public set computeRefreshRate(refreshRate: number) {
+    this._computeRefreshTime = 1000 / refreshRate;
   }
 }

@@ -24,8 +24,7 @@ const Slider = (props: SliderProps): React.ReactElement => {
           max={props.max}
           step={props.step}
           value={props.value}
-          onChange={onSliderChange}
-          list="tickmarks"></input>
+          onChange={onSliderChange}></input>
       </label>
     </div>
   );

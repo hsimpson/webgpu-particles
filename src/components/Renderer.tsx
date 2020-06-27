@@ -2,7 +2,7 @@ import React from 'react';
 import Particlerenderer from '../particlerenderer';
 import Stats from './Stats';
 import Gui from './Gui';
-import ComputeState from './state';
+import { ComputePropertiesAtom, ParticleCountAtom } from './state';
 import { useRecoilState } from 'recoil';
 
 interface FrameStats {
@@ -16,9 +16,11 @@ const Renderer = (): React.ReactElement => {
     frameTime: 0,
     cpuTime: 0,
   });
-  const [guiState] = useRecoilState(ComputeState);
+  const [computePropertiesState] = useRecoilState(ComputePropertiesAtom);
+  const [particleCountState] = useRecoilState(ParticleCountAtom);
 
   const particlerenderer = React.useRef<Particlerenderer>(undefined);
+  const particleChangeTimer = React.useRef<number>(undefined);
 
   const onFrameTimeChanged = (frameTime: number, cpuTime): void => {
     setFrameStats({
@@ -28,26 +30,37 @@ const Renderer = (): React.ReactElement => {
   };
 
   React.useEffect(() => {
-    particlerenderer.current = new Particlerenderer(canvasEl.current, guiState.particleCount, onFrameTimeChanged);
+    particlerenderer.current = new Particlerenderer(canvasEl.current, particleCountState, onFrameTimeChanged);
     particlerenderer.current.start();
   }, []);
 
   React.useEffect(() => {
     if (particlerenderer.current) {
-      particlerenderer.current.computePipline.force = guiState.force;
-      particlerenderer.current.computePipline.gravity = guiState.gravity;
+      particlerenderer.current.computePipline.force = computePropertiesState.force;
+      particlerenderer.current.computePipline.gravity = computePropertiesState.gravity;
       particlerenderer.current.particleMaterial.color = [
-        guiState.color.r / 255,
-        guiState.color.g / 255,
-        guiState.color.b / 255,
-        guiState.color.a,
+        computePropertiesState.color.r / 255,
+        computePropertiesState.color.g / 255,
+        computePropertiesState.color.b / 255,
+        computePropertiesState.color.a,
       ];
-
-      (async () => {
-        await particlerenderer.current.computePipline.updateParticleCount(guiState.particleCount);
-      })();
+      particlerenderer.current.computeRefreshRate = computePropertiesState.refreshRate;
     }
-  }, [guiState]);
+  }, [computePropertiesState]);
+
+  React.useEffect(() => {
+    if (particlerenderer.current) {
+      if (particleChangeTimer.current) {
+        window.clearTimeout(particleChangeTimer.current);
+      }
+      particleChangeTimer.current = window.setTimeout(() => {
+        (async () => {
+          console.log(`update particle count: ${particleCountState}`);
+          await particlerenderer.current.computePipline.updateParticleCount(particleCountState);
+        })();
+      }, 1000);
+    }
+  }, [particleCountState]);
 
   return (
     <React.Fragment>
