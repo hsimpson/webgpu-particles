@@ -66,6 +66,27 @@ const Gui = (): React.ReactElement => {
         labelText={`Force: ${computePropertiesState.force.toFixed(2)}`}></Slider>
       <ChromePicker color={computePropertiesState.color} onChange={onColorChange}></ChromePicker>
       <button onClick={onReset}>Reset to default values</button>
+      <div className="descriptionItem">
+        <span>Space: activate force</span>
+      </div>
+      <div className="descriptionItem">
+        <span>W: Move force -Z</span>
+      </div>
+      <div className="descriptionItem">
+        <span>A: Move force -X</span>
+      </div>
+      <div className="descriptionItem">
+        <span>S: Move force +Z</span>
+      </div>
+      <div className="descriptionItem">
+        <span>D: Move force +X</span>
+      </div>
+      <div className="descriptionItem">
+        <span>Page up: Move force +Y</span>
+      </div>
+      <div className="descriptionItem">
+        <span>Page down: Move force -Y</span>
+      </div>
     </div>
   );
 };
