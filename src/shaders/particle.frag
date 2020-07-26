@@ -1,4 +1,4 @@
-#version 450
+#version 460
 
 layout(set = 0, binding = 2) uniform Color {
   vec4 color;
