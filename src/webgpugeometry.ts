@@ -43,7 +43,6 @@ export default class WebGPUGeometry extends WebGPUGeometryBase {
     }
 
     this._vertexState = {
-      indexFormat: 'uint16', // does matter if non-indexed?
       vertexBuffers: layoutDescriptors,
     };
   }

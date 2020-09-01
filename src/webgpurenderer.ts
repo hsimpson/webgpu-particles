@@ -187,7 +187,7 @@ export default class WebGPURenderer {
           passEncoder.setVertexBuffer(i, geometry.vertexBuffers[i]);
         }
         if (geometry.indexCount > 0) {
-          passEncoder.setIndexBuffer(geometry.indexBuffer);
+          passEncoder.setIndexBuffer(geometry.indexBuffer, 'uint16');
           passEncoder.drawIndexed(geometry.indexCount, 1, 0, 0, 0);
         } else {
           passEncoder.draw(geometry.vertexCount, 1, 0, 0);

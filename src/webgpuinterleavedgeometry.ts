@@ -34,7 +34,6 @@ export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
     };
 
     this._vertexState = {
-      indexFormat: 'uint16', // does matter if non-indexed?
       vertexBuffers: [vertexBufferDesc],
     };
   }
