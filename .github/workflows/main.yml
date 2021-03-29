@@ -2,7 +2,8 @@ name: Build Web
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
 
 jobs:
   build:
@@ -10,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [15]
+        node: [15]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -29,7 +30,7 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           folder: dist
-          clean: true
+          # clean: true
