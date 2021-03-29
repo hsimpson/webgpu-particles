@@ -36,7 +36,8 @@ const Gui = (): React.ReactElement => {
         onValueChange={(particleCount: number) => {
           setParticleCountState(particleCount);
         }}
-        labelText={`Particle count: ${particleCountState.toLocaleString()}`}></Slider>
+        labelText={`Particle count: ${particleCountState.toLocaleString()}`}
+      />
       <Slider
         min={30}
         max={1000}
@@ -45,7 +46,8 @@ const Gui = (): React.ReactElement => {
         onValueChange={(refreshRate: number) => {
           setComputePropertiesState({ ...computePropertiesState, refreshRate });
         }}
-        labelText={`Compute refresh rate: ${computePropertiesState.refreshRate} Hz`}></Slider>
+        labelText={`Compute refresh rate: ${computePropertiesState.refreshRate} Hz`}
+      />
       <Slider
         min={-20}
         max={20}
@@ -54,7 +56,8 @@ const Gui = (): React.ReactElement => {
         onValueChange={(gravity: number) => {
           setComputePropertiesState({ ...computePropertiesState, gravity });
         }}
-        labelText={`Gravity: ${computePropertiesState.gravity.toFixed(2)}`}></Slider>
+        labelText={`Gravity: ${computePropertiesState.gravity.toFixed(2)}`}
+      />
       <Slider
         min={-50}
         max={50}
@@ -63,8 +66,9 @@ const Gui = (): React.ReactElement => {
         onValueChange={(force: number) => {
           setComputePropertiesState({ ...computePropertiesState, force });
         }}
-        labelText={`Force: ${computePropertiesState.force.toFixed(2)}`}></Slider>
-      <ChromePicker color={computePropertiesState.color} onChange={onColorChange}></ChromePicker>
+        labelText={`Force: ${computePropertiesState.force.toFixed(2)}`}
+      />
+      <ChromePicker color={computePropertiesState.color} onChange={onColorChange} />
       <button onClick={onReset}>Reset to default values</button>
       <div className="descriptionItem">
         <span>Space: activate force</span>

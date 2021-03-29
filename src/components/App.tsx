@@ -5,9 +5,7 @@ import WebGPURenderer from '../webgpurenderer';
 import ErrorMessage from './ErrorMessage';
 
 const App = (): React.ReactElement => {
-  return (
-    <RecoilRoot>{WebGPURenderer.supportsWebGPU() ? <Renderer></Renderer> : <ErrorMessage></ErrorMessage>}</RecoilRoot>
-  );
+  return <RecoilRoot>{WebGPURenderer.supportsWebGPU() ? <Renderer /> : <ErrorMessage />}</RecoilRoot>;
 };
 
 export default App;

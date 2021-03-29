@@ -26,9 +26,14 @@ const commonConfig: webpack.Configuration = {
     new HtmlWebpackPlugin({
       template: './src/index.html',
     }),
-    new CopyWebpackPlugin({
-      patterns: [{ from: './src/shaders/*.spv', to: '.', flatten: true }],
-    }),
+    (new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: './src/shaders/*.spv',
+          to: '.',
+        },
+      ],
+    }) as unknown) as webpack.WebpackPluginInstance, // FIXME
   ],
 };
 

@@ -5,12 +5,12 @@ const ErrorMessage = (): React.ReactElement => {
     <div className="error">
       Your browser does not support WebGPU yet{' '}
       <a href="https://github.com/gpuweb/gpuweb/wiki/Implementation-Status">(Implementation Status)</a>
-      <br></br>
+      <br />
       If you want to try this out:
       <ul>
         <li>In Chrome enable a flag: chrome://flags/#enable-unsafe-webgpu</li>
       </ul>
-      <br></br>
+      <br />
       Additional information:
       <ul>
         <li>

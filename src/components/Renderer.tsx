@@ -54,7 +54,7 @@ const Renderer = (): React.ReactElement => {
         window.clearTimeout(particleChangeTimer.current);
       }
       particleChangeTimer.current = window.setTimeout(() => {
-        (async () => {
+        void (async () => {
           console.log(`update particle count: ${particleCountState}`);
           await particlerenderer.current.computePipline.updateParticleCount(particleCountState);
         })();
@@ -64,9 +64,9 @@ const Renderer = (): React.ReactElement => {
 
   return (
     <React.Fragment>
-      <canvas className="webgpu_canvas" ref={canvasEl} tabIndex={1}></canvas>
-      <Stats frameTime={frameStats.frameTime} cpuTime={frameStats.cpuTime}></Stats>
-      <Gui></Gui>
+      <canvas className="webgpu_canvas" ref={canvasEl} tabIndex={1} />
+      <Stats frameTime={frameStats.frameTime} cpuTime={frameStats.cpuTime} />
+      <Gui />
     </React.Fragment>
   );
 };

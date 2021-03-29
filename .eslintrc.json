@@ -1,47 +1,75 @@
 {
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
   "env": {
-    "node": true,
     "browser": true,
-    "es6": true
+    "es6": true,
+    "node": true
   },
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "prettier",
-    "prettier/@typescript-eslint"
+    "plugin:react-hooks/recommended",
+    "prettier"
   ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint", "react"],
   "rules": {
-    // note you must disable the base rule as it can report incorrect errors
-    "no-unused-vars": "off",
+    "@typescript-eslint/explicit-function-return-type": [
+      "warn",
+      {
+        "allowExpressions": true
+      }
+    ],
+    "@typescript-eslint/explicit-member-accessibility": [
+      "error",
+      {
+        "accessibility": "explicit"
+      }
+    ],
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-parameter-properties": ["off"],
+    "@typescript-eslint/no-require-imports": "warn",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       {
-        "vars": "all",
         "args": "after-used",
-        "ignoreRestSiblings": false
+        "argsIgnorePattern": "^_",
+        "ignoreRestSiblings": false,
+        "vars": "all"
       }
     ],
-    "@typescript-eslint/no-require-imports": "warn",
     "@typescript-eslint/no-var-requires": "warn",
-    "@typescript-eslint/interface-name-prefix": "off",
-    //"@typescript-eslint/interface-name-prefix": ["warn", { "prefixWithI": "always" }],
-    "@typescript-eslint/no-parameter-properties": ["off"],
-    "@typescript-eslint/explicit-function-return-type": ["warn", { "allowExpressions": true }],
-    "@typescript-eslint/explicit-member-accessibility": ["error", { "accessibility": "explicit" }],
-    //"@typescript-eslint/explicit-member-accessibility": ["error"],
+    "@typescript-eslint/promise-function-async": "error",
+    "@typescript-eslint/require-await": "error",
     "eqeqeq": "error",
-    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
     "linebreak-style": ["error", "unix"],
+    "no-unused-vars": "off",
     "no-warning-comments": "warn",
     "quotes": ["error", "single"],
+    "react/self-closing-comp": [
+      "error",
+      {
+        "component": true,
+        "html": true
+      }
+    ],
     "semi": ["error", "always"]
-    //"sort-imports": "warn"
   },
   "settings": {
-    "react": { "version": "detect" }
+    "react": {
+      "version": "detect"
+    }
   }
 }

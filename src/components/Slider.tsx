@@ -17,14 +17,15 @@ const Slider = (props: SliderProps): React.ReactElement => {
     <div className="slider">
       <label>
         {props.labelText || ''}
-        <br></br>
+        <br />
         <input
           type="range"
           min={props.min}
           max={props.max}
           step={props.step}
           value={props.value}
-          onChange={onSliderChange}></input>
+          onChange={onSliderChange}
+        />
       </label>
     </div>
   );
