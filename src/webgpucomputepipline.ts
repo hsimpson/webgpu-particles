@@ -137,7 +137,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
       bindGroupLayouts: [this._bindGroupLayout],
     });
 
-    const computeStage: GPUProgrammableStageDescriptor = {
+    const computeStage: GPUProgrammableStage = {
       module: await this.loadShader(this._context, this._options.computeShaderUrl),
       entryPoint: 'main',
     };
