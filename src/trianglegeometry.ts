@@ -43,8 +43,8 @@ const indicesArray = new Uint16Array([0, 1, 2]);
 const geometry = new WebGPUInterleavedGeometry();
 geometry.setVertices(vertexArray, 7 * Float32Array.BYTES_PER_ELEMENT);
 geometry.setIndices(indicesArray);
-geometry.addAttribute({ shaderLocation: 0, offset: 0, format: 'float3' });
-geometry.addAttribute({ shaderLocation: 1, offset: 3 * Float32Array.BYTES_PER_ELEMENT, format: 'float4' });
+geometry.addAttribute({ shaderLocation: 0, offset: 0, format: 'float32x3' });
+geometry.addAttribute({ shaderLocation: 1, offset: 3 * Float32Array.BYTES_PER_ELEMENT, format: 'float32x4' });
 /**/
 
 /*/

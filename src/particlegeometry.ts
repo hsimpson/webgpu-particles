@@ -12,7 +12,7 @@ export default class ParticleGeometry extends WebGPUGeometry {
       descriptor: {
         shaderLocation: 0,
         offset: 0,
-        format: elements === 3 ? 'float3' : 'float4',
+        format: elements === 3 ? 'float32x3' : 'float32x4',
       },
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE,
     });
