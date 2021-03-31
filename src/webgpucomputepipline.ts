@@ -9,6 +9,7 @@ import ParticleGeometry from './particlegeometry';
 interface WebGPUComputePiplineOptions {
   computeShaderUrl: string;
   particleCount: number;
+  useWGSL?: boolean;
 }
 
 interface ComputeParams {
@@ -37,7 +38,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
   private _context: WebGPURenderContext;
 
   public constructor(drawMesh: WebGPUMesh, options: WebGPUComputePiplineOptions) {
-    super();
+    super(options.useWGSL);
 
     this._drawMesh = drawMesh;
 
