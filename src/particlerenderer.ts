@@ -66,6 +66,8 @@ export default class ParticleRenderer {
     const particleVertexShaderUrl = '/particle.vert.wgsl';
     const particleFragmenShaderUrl = '/particle.frag.wgsl';
 
+    const computeShaderUrl = 'particle.comp.wgsl';
+
     const boxPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'line-list',
       sampleCount: this._sampleCount,
@@ -113,8 +115,9 @@ export default class ParticleRenderer {
     /**/
 
     this._computePipeLine = new WebGPUComputePipline(this._particleMesh, {
-      computeShaderUrl: 'particle.comp.spv',
+      computeShaderUrl,
       particleCount: particleCount,
+      useWGSL: true,
     });
     this._computePipeLine.name = 'Compute pipeLine';
 
