@@ -49,12 +49,16 @@ export default class WebGPUMesh extends WebGPUEntity {
       {
         binding: 0,
         visibility: GPUShaderStage.VERTEX,
-        type: 'uniform-buffer',
+        buffer: {
+          type: 'uniform',
+        },
       },
       {
         binding: 1,
         visibility: GPUShaderStage.VERTEX,
-        type: 'uniform-buffer',
+        buffer: {
+          type: 'uniform',
+        },
       },
     ];
 
