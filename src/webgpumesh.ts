@@ -49,12 +49,16 @@ export default class WebGPUMesh extends WebGPUEntity {
       {
         binding: 0,
         visibility: GPUShaderStage.VERTEX,
-        type: 'uniform-buffer',
+        buffer: {
+          type: 'uniform',
+        },
       },
       {
         binding: 1,
         visibility: GPUShaderStage.VERTEX,
-        type: 'uniform-buffer',
+        buffer: {
+          type: 'uniform',
+        },
       },
     ];
 
@@ -78,7 +82,12 @@ export default class WebGPUMesh extends WebGPUEntity {
       bindGroupEntries.push(...this._material.bindGroupEntries);
     }
 
-    await this._pipeline.initalize(context, this._geometry.vertexState, bindGroupLayoutEntries, bindGroupEntries);
+    await this._pipeline.initalize(
+      context,
+      this._geometry.vertexBufferLayouts,
+      bindGroupLayoutEntries,
+      bindGroupEntries
+    );
   }
 
   private updateUniformBuffer(): void {

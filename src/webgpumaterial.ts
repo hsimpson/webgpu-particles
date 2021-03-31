@@ -30,7 +30,9 @@ export default class WebGPUMaterial {
     this._bindGroupLayoutEntries.push({
       binding: 2,
       visibility: GPUShaderStage.FRAGMENT,
-      type: 'uniform-buffer',
+      buffer: {
+        type: 'uniform',
+      },
     });
 
     this._bindGroupEntries.push({

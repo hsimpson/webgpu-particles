@@ -5,7 +5,7 @@ import WebGPUGeometryBase from './webgpugeometrybase';
 export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
   private _interleavedArray: Float32Array;
   private _stride: number;
-  private _attributes: GPUVertexAttributeDescriptor[] = [];
+  private _attributes: GPUVertexAttribute[] = [];
 
   public setVertices(array: Float32Array, stride: number): void {
     this._interleavedArray = array;
@@ -14,8 +14,8 @@ export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
     this._initialized = false;
   }
 
-  public addAttribute(attributeDescriptor: GPUVertexAttributeDescriptor): void {
-    this._attributes.push(attributeDescriptor);
+  public addAttribute(attribute: GPUVertexAttribute): void {
+    this._attributes.push(attribute);
   }
 
   public initalize(context: WebGPURenderContext): void {
@@ -27,14 +27,10 @@ export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
 
     this._vertexBuffers.push(createBuffer(context.device, this._interleavedArray, GPUBufferUsage.VERTEX));
 
-    const vertexBufferDesc: GPUVertexBufferLayoutDescriptor = {
+    this._vertexBufferLayouts.push({
       attributes: this._attributes,
       arrayStride: this._stride,
       stepMode: 'vertex',
-    };
-
-    this._vertexState = {
-      vertexBuffers: [vertexBufferDesc],
-    };
+    });
   }
 }

@@ -7,7 +7,7 @@ export default abstract class WebGPUGeometryBase extends WebGPUObjectBase {
   private _indexBuffer: GPUBuffer;
   protected _vertexBuffers: GPUBuffer[] = [];
   protected _initialized = false;
-  protected _vertexState: GPUVertexStateDescriptor;
+  protected _vertexBufferLayouts: GPUVertexBufferLayout[] = [];
   protected _indexCount = 0;
   protected _vertexCount = 0;
 
@@ -27,8 +27,8 @@ export default abstract class WebGPUGeometryBase extends WebGPUObjectBase {
     }
   }
 
-  public get vertexState(): GPUVertexStateDescriptor {
-    return this._vertexState;
+  public get vertexBufferLayouts(): GPUVertexBufferLayout[] {
+    return this._vertexBufferLayouts;
   }
 
   public get indexBuffer(): GPUBuffer {

@@ -83,17 +83,23 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
         {
           binding: 0,
           visibility: GPUShaderStage.COMPUTE,
-          type: 'uniform-buffer',
+          buffer: {
+            type: 'uniform',
+          },
         },
         {
           binding: 1,
           visibility: GPUShaderStage.COMPUTE,
-          type: 'storage-buffer',
+          buffer: {
+            type: 'storage',
+          },
         },
         {
           binding: 2,
           visibility: GPUShaderStage.COMPUTE,
-          type: 'storage-buffer',
+          buffer: {
+            type: 'storage',
+          },
         },
       ],
     });
@@ -137,7 +143,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
       bindGroupLayouts: [this._bindGroupLayout],
     });
 
-    const computeStage: GPUProgrammableStageDescriptor = {
+    const computeStage: GPUProgrammableStage = {
       module: await this.loadShader(this._context, this._options.computeShaderUrl),
       entryPoint: 'main',
     };

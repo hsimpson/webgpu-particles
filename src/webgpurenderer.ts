@@ -65,7 +65,7 @@ export default class WebGPURenderer {
 
     this._device = await this._adapter.requestDevice();
 
-    this._queue = this._device.defaultQueue;
+    this._queue = this._device.queue;
 
     this._context = new WebGPURenderContext(this._canvas, this._device, this._queue);
 
@@ -73,7 +73,7 @@ export default class WebGPURenderer {
     const swapChainDesc: GPUSwapChainDescriptor = {
       device: this._device,
       format: this._options.colorFormat,
-      usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
     };
     this._swapchain = context.configureSwapChain(swapChainDesc);
   }
@@ -82,7 +82,7 @@ export default class WebGPURenderer {
     const textureSize: GPUExtent3D = {
       width: this._canvas.width,
       height: this._canvas.height,
-      depth: 1,
+      depthOrArrayLayers: 1,
     };
 
     const depthTextureDesc: GPUTextureDescriptor = {
@@ -92,7 +92,7 @@ export default class WebGPURenderer {
       sampleCount: this._options.sampleCount,
       dimension: '2d',
       format: this._options.depthFormat,
-      usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
     };
 
     const depthTexture = this._device.createTexture(depthTextureDesc);
@@ -102,7 +102,7 @@ export default class WebGPURenderer {
       size: textureSize,
       sampleCount: this._options.sampleCount,
       format: this._options.colorFormat,
-      usage: GPUTextureUsage.OUTPUT_ATTACHMENT,
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
     };
 
     const colorTexture = this._device.createTexture(colorTextureDesc);

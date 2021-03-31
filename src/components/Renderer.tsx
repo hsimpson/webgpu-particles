@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useRecoilState } from 'recoil';
 import Particlerenderer from '../particlerenderer';
-import Stats from './Stats';
 import Gui from './Gui';
 import { ComputePropertiesAtom, ParticleCountAtom } from './state';
-import { useRecoilState } from 'recoil';
+import Stats from './Stats';
 
 interface FrameStats {
   frameTime: number;
@@ -11,16 +11,16 @@ interface FrameStats {
 }
 
 const Renderer = (): React.ReactElement => {
-  const canvasEl = React.useRef<HTMLCanvasElement>(undefined);
-  const [frameStats, setFrameStats] = React.useState<FrameStats>({
+  const canvasEl = useRef<HTMLCanvasElement>(undefined);
+  const [frameStats, setFrameStats] = useState<FrameStats>({
     frameTime: 0,
     cpuTime: 0,
   });
   const [computePropertiesState] = useRecoilState(ComputePropertiesAtom);
   const [particleCountState] = useRecoilState(ParticleCountAtom);
 
-  const particlerenderer = React.useRef<Particlerenderer>(undefined);
-  const particleChangeTimer = React.useRef<number>(undefined);
+  const particlerenderer = useRef<Particlerenderer>(undefined);
+  const particleChangeTimer = useRef<number>(undefined);
 
   const onFrameTimeChanged = (frameTime: number, cpuTime): void => {
     setFrameStats({
@@ -29,12 +29,12 @@ const Renderer = (): React.ReactElement => {
     });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     particlerenderer.current = new Particlerenderer(canvasEl.current, particleCountState, onFrameTimeChanged);
     particlerenderer.current.start();
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (particlerenderer.current) {
       particlerenderer.current.computePipline.force = computePropertiesState.force;
       particlerenderer.current.computePipline.gravity = computePropertiesState.gravity;
@@ -48,7 +48,7 @@ const Renderer = (): React.ReactElement => {
     }
   }, [computePropertiesState]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (particlerenderer.current) {
       if (particleChangeTimer.current) {
         window.clearTimeout(particleChangeTimer.current);
