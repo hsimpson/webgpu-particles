@@ -78,7 +78,12 @@ export default class WebGPUMesh extends WebGPUEntity {
       bindGroupEntries.push(...this._material.bindGroupEntries);
     }
 
-    await this._pipeline.initalize(context, this._geometry.vertexState, bindGroupLayoutEntries, bindGroupEntries);
+    await this._pipeline.initalize(
+      context,
+      this._geometry.vertexBufferLayouts,
+      bindGroupLayoutEntries,
+      bindGroupEntries
+    );
   }
 
   private updateUniformBuffer(): void {

@@ -27,14 +27,10 @@ export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
 
     this._vertexBuffers.push(createBuffer(context.device, this._interleavedArray, GPUBufferUsage.VERTEX));
 
-    const vertexBufferDesc: GPUVertexBufferLayout = {
+    this._vertexBufferLayouts.push({
       attributes: this._attributes,
       arrayStride: this._stride,
       stepMode: 'vertex',
-    };
-
-    this._vertexState = {
-      vertexBuffers: [vertexBufferDesc],
-    };
+    });
   }
 }
