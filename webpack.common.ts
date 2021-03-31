@@ -1,8 +1,8 @@
-import webpack from 'webpack';
+import { Configuration, WebpackPluginInstance } from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 
-const commonConfig: webpack.Configuration = {
+const commonConfig: Configuration = {
   entry: './src/index.tsx',
 
   resolve: {
@@ -30,10 +30,10 @@ const commonConfig: webpack.Configuration = {
       patterns: [
         {
           from: './src/shaders/*.spv',
-          to: '.',
+          to: '[name][ext]',
         },
       ],
-    }) as unknown) as webpack.WebpackPluginInstance, // FIXME
+    }) as unknown) as WebpackPluginInstance, // FIXME
   ],
 };
 
