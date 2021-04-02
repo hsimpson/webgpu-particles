@@ -50,10 +50,15 @@ fn main() -> void {
 
   if (position.y < -v3BB_half.y) {  // BOTTOM
     position.y = -2.0 * v3BB_half.y - position.y;
-    velocity.y = velocity.y * -0.45;  // if its on the bottom we extra dampen
+    if(params.fGravity > 0.0) {
+      velocity.y = velocity.y * -0.45;  // if its on the bottom we extra dampen
+    }
     velocity.x = velocity.x * 0.9;
   } elseif (position.y > v3BB_half.y) {  // TOP
     position.y = 2.0 * v3BB_half.y - position.y;
+    if(params.fGravity < 0.0) {
+      velocity.y = velocity.y * 0.45;  // if its on the top we extra dampen
+    }
     velocity.y = velocity.y * -0.9;
   }
 
