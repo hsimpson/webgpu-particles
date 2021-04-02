@@ -30,9 +30,21 @@ const Renderer = (): React.ReactElement => {
   };
 
   useEffect(() => {
-    particlerenderer.current = new Particlerenderer(canvasEl.current, particleCountState, onFrameTimeChanged);
-    particlerenderer.current.start();
-  }, []);
+    if (particlerenderer.current) {
+      if (particleChangeTimer.current) {
+        window.clearTimeout(particleChangeTimer.current);
+      }
+      particleChangeTimer.current = window.setTimeout(() => {
+        void (async () => {
+          console.log(`update particle count: ${particleCountState}`);
+          await particlerenderer.current.computePipline.updateParticleCount(particleCountState);
+        })();
+      }, 1000);
+    } else {
+      particlerenderer.current = new Particlerenderer(canvasEl.current, particleCountState, onFrameTimeChanged);
+      particlerenderer.current.start();
+    }
+  }, [particleCountState]);
 
   useEffect(() => {
     if (particlerenderer.current) {
@@ -47,20 +59,6 @@ const Renderer = (): React.ReactElement => {
       particlerenderer.current.computeRefreshRate = computePropertiesState.refreshRate;
     }
   }, [computePropertiesState]);
-
-  useEffect(() => {
-    if (particlerenderer.current) {
-      if (particleChangeTimer.current) {
-        window.clearTimeout(particleChangeTimer.current);
-      }
-      particleChangeTimer.current = window.setTimeout(() => {
-        void (async () => {
-          console.log(`update particle count: ${particleCountState}`);
-          await particlerenderer.current.computePipline.updateParticleCount(particleCountState);
-        })();
-      }, 1000);
-    }
-  }, [particleCountState]);
 
   return (
     <React.Fragment>
