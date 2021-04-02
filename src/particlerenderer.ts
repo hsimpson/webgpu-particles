@@ -60,29 +60,40 @@ export default class ParticleRenderer {
 
     this._renderer = new WebGPURenderer(this._canvas, this._camera, { sampleCount: this._sampleCount });
 
+    const basicVertexShaderUrl = '/basic.vert.wgsl';
+    const basicFragmentShaderUrl = '/basic.frag.wgsl';
+
+    const particleVertexShaderUrl = '/particle.vert.wgsl';
+    const particleFragmenShaderUrl = '/particle.frag.wgsl';
+
+    const computeShaderUrl = 'particle.comp.wgsl';
+
     const boxPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'line-list',
       sampleCount: this._sampleCount,
-      vertexShaderUrl: 'basic.vert.spv',
-      fragmentShaderUrl: 'basic.frag.spv',
+      vertexShaderUrl: basicVertexShaderUrl,
+      fragmentShaderUrl: basicFragmentShaderUrl,
+      useWGSL: true,
     });
     boxPipeline.name = 'boxPipeline';
 
     const crossHairPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'line-list',
       sampleCount: this._sampleCount,
-      vertexShaderUrl: 'basic.vert.spv',
-      fragmentShaderUrl: 'basic.frag.spv',
+      vertexShaderUrl: basicVertexShaderUrl,
+      fragmentShaderUrl: basicFragmentShaderUrl,
+      useWGSL: true,
     });
     crossHairPipeline.name = 'crossHairPipeline';
 
-    const pointPipeline = new WebGPURenderPipeline({
+    const particlePipeline = new WebGPURenderPipeline({
       primitiveTopology: 'point-list',
       sampleCount: this._sampleCount,
-      vertexShaderUrl: 'particle.vert.spv',
-      fragmentShaderUrl: 'particle.frag.spv',
+      vertexShaderUrl: particleVertexShaderUrl,
+      fragmentShaderUrl: particleFragmenShaderUrl,
+      useWGSL: true,
     });
-    pointPipeline.name = 'pointPipeline';
+    particlePipeline.name = 'pointPipeline';
 
     /**/
     this._boxMesh = new WebGPUMesh(BoxGeometry, boxPipeline);
@@ -91,7 +102,11 @@ export default class ParticleRenderer {
     this._crossHairMesh.name = 'CrossHairMesh';
 
     this._particleMaterial = new WebGPUMaterial([1.0, 0.0, 1.0, 0.5]);
-    this._particleMesh = new WebGPUMesh(new ParticleGeometry(particleCount, 4), pointPipeline, this._particleMaterial);
+    this._particleMesh = new WebGPUMesh(
+      new ParticleGeometry(particleCount, 4),
+      particlePipeline,
+      this._particleMaterial
+    );
     this._particleMesh.name = 'ParticleMesh';
 
     this._renderer.addMesh(this._boxMesh);
@@ -100,8 +115,9 @@ export default class ParticleRenderer {
     /**/
 
     this._computePipeLine = new WebGPUComputePipline(this._particleMesh, {
-      computeShaderUrl: 'particle.comp.spv',
+      computeShaderUrl,
       particleCount: particleCount,
+      useWGSL: true,
     });
     this._computePipeLine.name = 'Compute pipeLine';
 

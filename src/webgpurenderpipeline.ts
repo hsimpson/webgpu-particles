@@ -8,6 +8,7 @@ interface WebGPURenderPipelineOptions {
   depthFormat?: GPUTextureFormat;
   vertexShaderUrl?: string;
   fragmentShaderUrl?: string;
+  useWGSL?: boolean;
 }
 
 export default class WebGPURenderPipeline extends WebGPUPipelineBase {
@@ -15,7 +16,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
   private _bindGroup: GPUBindGroup;
 
   public constructor(options: WebGPURenderPipelineOptions) {
-    super();
+    super(options.useWGSL);
     const defaultOptions: WebGPURenderPipelineOptions = {
       primitiveTopology: 'triangle-list',
       sampleCount: 1,

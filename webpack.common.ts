@@ -32,6 +32,10 @@ const commonConfig: Configuration = {
           from: './src/shaders/*.spv',
           to: '[name][ext]',
         },
+        {
+          from: './src/shaders/*.wgsl',
+          to: '[name][ext]',
+        },
       ],
     }) as unknown) as WebpackPluginInstance, // FIXME
   ],
