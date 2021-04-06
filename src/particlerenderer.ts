@@ -60,20 +60,24 @@ export default class ParticleRenderer {
 
     this._renderer = new WebGPURenderer(this._canvas, this._camera, { sampleCount: this._sampleCount });
 
-    const basicVertexShaderUrl = './basic.vert.wgsl';
-    const basicFragmentShaderUrl = './basic.frag.wgsl';
+    const useWGSL = true;
 
-    const particleVertexShaderUrl = './particle.vert.wgsl';
-    const particleFragmenShaderUrl = './particle.frag.wgsl';
-
-    const computeShaderUrl = 'particle.comp.wgsl';
+    let shaderExtension = 'wgsl';
+    if (!useWGSL) {
+      shaderExtension = 'spv';
+    }
+    const basicFragmentShaderUrl = `./basic.frag.${shaderExtension}`;
+    const basicVertexShaderUrl = `./basic.vert.${shaderExtension}`;
+    const computeShaderUrl = `./particle.comp.${shaderExtension}`;
+    const particleVertexShaderUrl = `./particle.vert.${shaderExtension}`;
+    const particleFragmenShaderUrl = `./particle.frag.${shaderExtension}`;
 
     const boxPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'line-list',
       sampleCount: this._sampleCount,
       vertexShaderUrl: basicVertexShaderUrl,
       fragmentShaderUrl: basicFragmentShaderUrl,
-      useWGSL: true,
+      useWGSL,
     });
     boxPipeline.name = 'boxPipeline';
 
@@ -82,7 +86,7 @@ export default class ParticleRenderer {
       sampleCount: this._sampleCount,
       vertexShaderUrl: basicVertexShaderUrl,
       fragmentShaderUrl: basicFragmentShaderUrl,
-      useWGSL: true,
+      useWGSL,
     });
     crossHairPipeline.name = 'crossHairPipeline';
 
@@ -91,7 +95,7 @@ export default class ParticleRenderer {
       sampleCount: this._sampleCount,
       vertexShaderUrl: particleVertexShaderUrl,
       fragmentShaderUrl: particleFragmenShaderUrl,
-      useWGSL: true,
+      useWGSL,
     });
     particlePipeline.name = 'pointPipeline';
 
@@ -117,7 +121,7 @@ export default class ParticleRenderer {
     this._computePipeLine = new WebGPUComputePipline(this._particleMesh, {
       computeShaderUrl,
       particleCount: particleCount,
-      useWGSL: true,
+      useWGSL,
     });
     this._computePipeLine.name = 'Compute pipeLine';
 
