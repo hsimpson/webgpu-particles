@@ -1,30 +1,28 @@
 [[block]] struct ComputeParams {
-  [[offset(0)]] vHalfBounding : vec4<f32>;
-  [[offset(16)]] vForcePos : vec4<f32>;
-  [[offset(32)]] fDeltaTime: f32;
-  [[offset(36)]] fGravity: f32;
-  [[offset(40)]] fForce: f32;
-  [[offset(44)]] fForceOn: f32;
+  vHalfBounding : vec4<f32>;
+  vForcePos : vec4<f32>;
+  fDeltaTime: f32;
+  fGravity: f32;
+  fForce: f32;
+  fForceOn: f32;
 };
 
 [[block]] struct ParticlesA {
-  [[offset(0)]] pos : [[stride(16)]] array<vec4<f32>>;
+  pos : [[stride(16)]] array<vec4<f32>>;
 };
 
 [[block]] struct ParticlesB {
-  [[offset(0)]] vel : [[stride(16)]] array<vec4<f32>>;
+  vel : [[stride(16)]] array<vec4<f32>>;
 };
 
 [[group(0), binding(0)]] var<uniform> params : ComputeParams;
 [[group(0), binding(1)]] var<storage_buffer> positions : ParticlesA;
 [[group(0), binding(2)]] var<storage_buffer> velocities : ParticlesB;
 
-[[builtin(global_invocation_id)]] var<in> GlobalInvocationID : vec3<u32>;
-
-var EPSILON: vec3<f32> = vec3<f32>(0.0001, 0.0001, 0.0001);
+const EPSILON: vec3<f32> = vec3<f32>(0.0001, 0.0001, 0.0001);
 
 [[stage(compute)]]
-fn main() -> void {
+fn main([[builtin(global_invocation_id)]] GlobalInvocationID : vec3<u32>) {
 
   var index: u32 = GlobalInvocationID.x;
 
