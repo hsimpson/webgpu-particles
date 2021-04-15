@@ -12,18 +12,19 @@ export default abstract class WebGPUPipelineBase extends WebGPUObjectBase {
   }
 
   protected async loadShader(context: WebGPURenderContext, shaderUrl: string): Promise<GPUShaderModule> {
-    let code: Uint32Array | string;
+    // let code: Uint32Array | string;
     const response = await fetch(shaderUrl);
+    let shaderModule: GPUShaderModule;
 
     if (!this._useWGSL) {
-      code = new Uint32Array(await response.arrayBuffer());
+      shaderModule = context.device.createShaderModule({
+        code: new Uint32Array(await response.arrayBuffer()),
+      });
     } else {
-      code = await response.text();
+      shaderModule = context.device.createShaderModule({
+        code: await response.text(),
+      });
     }
-
-    const shaderModule = context.device.createShaderModule({
-      code,
-    });
 
     return shaderModule;
   }

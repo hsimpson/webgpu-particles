@@ -151,7 +151,8 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
 
     const pipelineDesc: GPUComputePipelineDescriptor = {
       layout,
-      computeStage,
+      computeStage, //deprecated
+      compute: computeStage,
     };
 
     this._pipeline = this._context.device.createComputePipeline(pipelineDesc);

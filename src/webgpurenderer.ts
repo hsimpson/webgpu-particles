@@ -25,8 +25,8 @@ export default class WebGPURenderer {
 
   private _colorTextureView: GPUTextureView;
   private _depthTextureView: GPUTextureView;
-  private _colorAttachment: GPURenderPassColorAttachmentDescriptor;
-  private _depthAttachment: GPURenderPassDepthStencilAttachmentDescriptor;
+  private _colorAttachment: GPURenderPassColorAttachmentOld;
+  private _depthAttachment: GPURenderPassDepthStencilAttachmentOld;
 
   private _camera: Camera;
 
@@ -121,6 +121,9 @@ export default class WebGPURenderer {
       stencilLoadValue: 'load',
       stencilStoreOp: 'store',
     };
+
+    // FIXME: needed for Firefox
+    // (this._depthAttachment as any).view = this._depthAttachment.attachment;
   }
 
   private async initializeResources(): Promise<void> {
@@ -145,6 +148,9 @@ export default class WebGPURenderer {
     } else {
       this._colorAttachment.attachment = this._swapchain.getCurrentTexture().createView();
     }
+
+    // FIXME: this is needed for Firefox
+    // (this._colorAttachment as any).view = this._colorAttachment.attachment;
 
     const renderPassDesc: GPURenderPassDescriptor = {
       colorAttachments: [this._colorAttachment],
