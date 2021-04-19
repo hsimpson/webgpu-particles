@@ -25,8 +25,8 @@ export default class WebGPURenderer {
 
   private _colorTextureView: GPUTextureView;
   private _depthTextureView: GPUTextureView;
-  private _colorAttachment: GPURenderPassColorAttachmentOld;
-  private _depthAttachment: GPURenderPassDepthStencilAttachmentOld;
+  private _colorAttachment: GPURenderPassColorAttachmentNew;
+  private _depthAttachment: GPURenderPassDepthStencilAttachmentNew;
 
   private _camera: Camera;
 
@@ -109,21 +109,18 @@ export default class WebGPURenderer {
     this._colorTextureView = colorTexture.createView();
 
     this._colorAttachment = {
-      attachment: null,
+      view: null,
       loadValue: { r: 0, g: 0, b: 0, a: 1 },
       storeOp: 'store',
     };
 
     this._depthAttachment = {
-      attachment: this._depthTextureView,
+      view: this._depthTextureView,
       depthLoadValue: 1,
       depthStoreOp: 'store',
       stencilLoadValue: 'load',
       stencilStoreOp: 'store',
     };
-
-    // FIXME: needed for Firefox
-    // (this._depthAttachment as any).view = this._depthAttachment.attachment;
   }
 
   private async initializeResources(): Promise<void> {
@@ -143,14 +140,11 @@ export default class WebGPURenderer {
 
   private encodeCommands(deltaTime: number): void {
     if (this._options.sampleCount > 1) {
-      this._colorAttachment.attachment = this._colorTextureView;
+      this._colorAttachment.view = this._colorTextureView;
       this._colorAttachment.resolveTarget = this._swapchain.getCurrentTexture().createView();
     } else {
-      this._colorAttachment.attachment = this._swapchain.getCurrentTexture().createView();
+      this._colorAttachment.view = this._swapchain.getCurrentTexture().createView();
     }
-
-    // FIXME: this is needed for Firefox
-    // (this._colorAttachment as any).view = this._colorAttachment.attachment;
 
     const renderPassDesc: GPURenderPassDescriptor = {
       colorAttachments: [this._colorAttachment],
