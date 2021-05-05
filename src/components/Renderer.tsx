@@ -56,7 +56,6 @@ const Renderer = (): React.ReactElement => {
         computePropertiesState.color.b / 255,
         computePropertiesState.color.a,
       ];
-      particlerenderer.current.computeRefreshRate = computePropertiesState.refreshRate;
     }
   }, [computePropertiesState]);
 

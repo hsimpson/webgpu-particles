@@ -39,16 +39,6 @@ const Gui = (): React.ReactElement => {
         labelText={`Particle count: ${particleCountState.toLocaleString()}`}
       />
       <Slider
-        min={30}
-        max={1000}
-        step={10}
-        value={computePropertiesState.refreshRate}
-        onValueChange={(refreshRate: number) => {
-          setComputePropertiesState({ ...computePropertiesState, refreshRate });
-        }}
-        labelText={`Compute refresh rate: ${computePropertiesState.refreshRate} Hz`}
-      />
-      <Slider
         min={-20}
         max={20}
         step={0.01}

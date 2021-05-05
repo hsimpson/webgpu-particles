@@ -5,7 +5,6 @@ export const ComputePropertiesAtom = atom({
   default: {
     gravity: 9.81,
     force: 20,
-    refreshRate: 60,
     color: {
       r: 255,
       g: 0,

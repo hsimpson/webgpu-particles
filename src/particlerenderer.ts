@@ -305,8 +305,4 @@ export default class ParticleRenderer {
   public get particleMaterial(): WebGPUMaterial {
     return this._particleMaterial;
   }
-
-  public set computeRefreshRate(refreshRate: number) {
-    this._renderer.computeRefreshRate = refreshRate;
-  }
 }

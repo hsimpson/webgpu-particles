@@ -33,8 +33,6 @@ export default class WebGPURenderer {
   private _options: WebGPURendererOptions;
 
   private _computePipeLine: WebGPUComputePipline;
-  private _computeDeltaTime = 0;
-  private _computeRefreshTime = 1000 / 60;
 
   public constructor(canvas: HTMLCanvasElement, camera: Camera, settings?: WebGPURendererOptions) {
     this._canvas = canvas;
@@ -138,7 +136,20 @@ export default class WebGPURenderer {
     }
   }
 
-  private encodeCommands(deltaTime: number): void {
+  private computePass(deltaTime: number): void {
+    const commandEncoder = this._device.createCommandEncoder();
+
+    this._computePipeLine.deltaTime(deltaTime);
+    const passEncoder = commandEncoder.beginComputePass();
+    passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
+    passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
+    passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
+    passEncoder.endPass();
+
+    this._queue.submit([commandEncoder.finish()]);
+  }
+
+  private renderPass(): void {
     if (this._options.sampleCount > 1) {
       this._colorAttachment.view = this._colorTextureView;
       this._colorAttachment.resolveTarget = this._swapchain.getCurrentTexture().createView();
@@ -152,50 +163,26 @@ export default class WebGPURenderer {
     };
 
     const commandEncoder = this._device.createCommandEncoder();
+    const passEncoder = commandEncoder.beginRenderPass(renderPassDesc);
 
-    this._computeDeltaTime += deltaTime;
+    for (const mesh of this._meshes) {
+      const geometry = mesh.geometry;
+      passEncoder.setPipeline(mesh.gpuPipeline);
 
-    if (this._computeDeltaTime >= this._computeRefreshTime) {
-      // Compute pass
-      /**/
-      if (this._computePipeLine) {
-        this._computePipeLine.deltaTime(this._computeDeltaTime);
-        const passEncoder = commandEncoder.beginComputePass();
-        passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
-        passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
-        passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
-        passEncoder.endPass();
-        this._computeDeltaTime = 0;
+      passEncoder.setBindGroup(0, mesh.bindGroup);
+
+      for (let i = 0; i < geometry.vertexBuffers.length; i++) {
+        passEncoder.setVertexBuffer(i, geometry.vertexBuffers[i]);
       }
-      /**/
-    }
-
-    // Render pass
-    {
-      const passEncoder = commandEncoder.beginRenderPass(renderPassDesc);
-      //passEncoder.setViewport(0, 0, this._canvas.width, this._canvas.height, 0, 1);
-      //passEncoder.setScissorRect(0, 0, this._canvas.width, this._canvas.height);
-
-      /**/
-      for (const mesh of this._meshes) {
-        const geometry = mesh.geometry;
-        passEncoder.setPipeline(mesh.gpuPipeline);
-
-        passEncoder.setBindGroup(0, mesh.bindGroup);
-
-        for (let i = 0; i < geometry.vertexBuffers.length; i++) {
-          passEncoder.setVertexBuffer(i, geometry.vertexBuffers[i]);
-        }
-        if (geometry.indexCount > 0) {
-          passEncoder.setIndexBuffer(geometry.indexBuffer, 'uint16');
-          passEncoder.drawIndexed(geometry.indexCount, 1, 0, 0, 0);
-        } else {
-          passEncoder.draw(geometry.vertexCount, 1, 0, 0);
-        }
+      if (geometry.indexCount > 0) {
+        passEncoder.setIndexBuffer(geometry.indexBuffer, 'uint16');
+        passEncoder.drawIndexed(geometry.indexCount, 1, 0, 0, 0);
+      } else {
+        passEncoder.draw(geometry.vertexCount, 1, 0, 0);
       }
-      /**/
-      passEncoder.endPass();
     }
+    /**/
+    passEncoder.endPass();
 
     this._queue.submit([commandEncoder.finish()]);
   }
@@ -205,7 +192,8 @@ export default class WebGPURenderer {
   }
 
   public render = (deltaTime: number): void => {
-    this.encodeCommands(deltaTime);
+    this.computePass(deltaTime);
+    this.renderPass();
   };
 
   public async start(): Promise<void> {
@@ -220,9 +208,5 @@ export default class WebGPURenderer {
 
   public setComputePipeLine(pipeline: WebGPUComputePipline): void {
     this._computePipeLine = pipeline;
-  }
-
-  public set computeRefreshRate(refreshRate: number) {
-    this._computeRefreshTime = 1000 / refreshRate;
   }
 }
