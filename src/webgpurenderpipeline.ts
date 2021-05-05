@@ -16,7 +16,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
   private _bindGroup: GPUBindGroup;
 
   public constructor(options: WebGPURenderPipelineOptions) {
-    super(options.useWGSL);
+    super();
     const defaultOptions: WebGPURenderPipelineOptions = {
       primitiveTopology: 'triangle-list',
       sampleCount: 1,

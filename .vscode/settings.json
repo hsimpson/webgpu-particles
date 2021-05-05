@@ -26,6 +26,5 @@
     "dist": true,
     "node_modules": true
   },
-  "glsllint.glslangValidatorArgs": "-V -o %temp%/shader.spv",
   "typescript.tsdk": "node_modules/typescript/lib"
 }

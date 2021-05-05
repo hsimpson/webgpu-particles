@@ -29,10 +29,6 @@ const commonConfig: Configuration = {
     (new CopyWebpackPlugin({
       patterns: [
         {
-          from: './src/shaders/*.spv',
-          to: '[name][ext]',
-        },
-        {
           from: './src/shaders/*.wgsl',
           to: '[name][ext]',
         },

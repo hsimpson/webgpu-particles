@@ -60,24 +60,17 @@ export default class ParticleRenderer {
 
     this._renderer = new WebGPURenderer(this._canvas, this._camera, { sampleCount: this._sampleCount });
 
-    const useWGSL = true;
-
-    let shaderExtension = 'wgsl';
-    if (!useWGSL) {
-      shaderExtension = 'spv';
-    }
-    const basicFragmentShaderUrl = `./basic.frag.${shaderExtension}`;
-    const basicVertexShaderUrl = `./basic.vert.${shaderExtension}`;
-    const computeShaderUrl = `./particle.comp.${shaderExtension}`;
-    const particleVertexShaderUrl = `./particle.vert.${shaderExtension}`;
-    const particleFragmenShaderUrl = `./particle.frag.${shaderExtension}`;
+    const basicFragmentShaderUrl = './basic.frag.wgsl';
+    const basicVertexShaderUrl = './basic.vert.wgsl';
+    const computeShaderUrl = './particle.comp.wgsl';
+    const particleVertexShaderUrl = './particle.vert.wgsl';
+    const particleFragmenShaderUrl = './particle.frag.wgsl';
 
     const boxPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'line-list',
       sampleCount: this._sampleCount,
       vertexShaderUrl: basicVertexShaderUrl,
       fragmentShaderUrl: basicFragmentShaderUrl,
-      useWGSL,
     });
     boxPipeline.name = 'boxPipeline';
 
@@ -86,7 +79,6 @@ export default class ParticleRenderer {
       sampleCount: this._sampleCount,
       vertexShaderUrl: basicVertexShaderUrl,
       fragmentShaderUrl: basicFragmentShaderUrl,
-      useWGSL,
     });
     crossHairPipeline.name = 'crossHairPipeline';
 
@@ -95,7 +87,6 @@ export default class ParticleRenderer {
       sampleCount: this._sampleCount,
       vertexShaderUrl: particleVertexShaderUrl,
       fragmentShaderUrl: particleFragmenShaderUrl,
-      useWGSL,
     });
     particlePipeline.name = 'pointPipeline';
 
@@ -121,7 +112,6 @@ export default class ParticleRenderer {
     this._computePipeLine = new WebGPUComputePipline(this._particleMesh, {
       computeShaderUrl,
       particleCount: particleCount,
-      useWGSL,
     });
     this._computePipeLine.name = 'Compute pipeLine';
 
@@ -131,8 +121,8 @@ export default class ParticleRenderer {
     const trianglePipeline = new WebGPURenderPipeline(this._camera, {
       primitiveTopology: 'triangle-list',
       sampleCount: this._sampleCount,
-      vertexShaderUrl: 'basic.vert.spv',
-      fragmentShaderUrl: 'basic.frag.spv',
+      vertexShaderUrl: 'basic.vert.wgsl',
+      fragmentShaderUrl: 'basic.frag.wgsl',
     });
     this._triangleMesh1 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
     this._triangleMesh2 = new WebGPUMesh(TriangleGeometry, trianglePipeline);
