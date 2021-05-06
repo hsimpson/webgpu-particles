@@ -60,11 +60,11 @@ export default class ParticleRenderer {
 
     this._renderer = new WebGPURenderer(this._canvas, this._camera, { sampleCount: this._sampleCount });
 
-    const basicFragmentShaderUrl = './basic.frag.wgsl';
-    const basicVertexShaderUrl = './basic.vert.wgsl';
-    const computeShaderUrl = './particle.comp.wgsl';
-    const particleVertexShaderUrl = './particle.vert.wgsl';
-    const particleFragmenShaderUrl = './particle.frag.wgsl';
+    const basicFragmentShaderUrl = './shaders/basic.frag.wgsl';
+    const basicVertexShaderUrl = './shaders/basic.vert.wgsl';
+    const computeShaderUrl = './shaders/particle.comp.wgsl';
+    const particleVertexShaderUrl = './shaders/particle.vert.wgsl';
+    const particleFragmenShaderUrl = './shaders/particle.frag.wgsl';
 
     const boxPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'line-list',
