@@ -272,10 +272,10 @@
     "@typescript-eslint/types" "4.22.1"
     eslint-visitor-keys "^2.0.0"
 
-"@webgpu/types@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.2.tgz#471162107b014c39526dc28b7dad2fc6006550ef"
-  integrity sha512-x2xc4dfBRNNE2ACsgn/x633ETgkXQMLSfrmNdfy3DH0zno3AAsIVB5xQqYPDOb2ANE6vpJpDrHGDlrRVSsgomA==
+"@webgpu/types@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.3.tgz#0c223b06e81713ae011fc8986921725a1685d967"
+  integrity sha512-rvqmSxoSMqwIjtvMHOvdvgCtJaz8PS4okXTL47Jyf/X5rDTiRoKEW1U3+XPsWcfY9Hp5gir3A0ksi+Eh81bbyg==
 
 abbrev@1:
   version "1.1.1"
