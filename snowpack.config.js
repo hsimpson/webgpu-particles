@@ -7,7 +7,7 @@ module.exports = {
     src: { url: '/' },
     // public: { url: '/', static: true, resolve: false },
   },
-  // plugins: ['@snowpack/plugin-typescript'],
+  plugins: ['@snowpack/plugin-typescript', '@snowpack/plugin-postcss'],
   packageOptions: {
     /* ... */
   },

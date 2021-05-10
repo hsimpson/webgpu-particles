@@ -1,6 +1,5 @@
 import WebGPURenderer from './webgpurenderer';
 import Camera from './camera';
-import ResizeObserver from 'resize-observer-polyfill';
 //import { TriangleGeometry } from './trianglegeometry';
 import { BoxGeometry, BoxDimensions } from './boxgeometry';
 import { CrossHairGeometry } from './crosshairgeometry';

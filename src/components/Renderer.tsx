@@ -61,7 +61,7 @@ const Renderer = (): React.ReactElement => {
 
   return (
     <React.Fragment>
-      <canvas className="webgpu_canvas" ref={canvasEl} tabIndex={1} />
+      <canvas className="w-full h-full" ref={canvasEl} tabIndex={1} />
       <Stats frameTime={frameStats.frameTime} cpuTime={frameStats.cpuTime} />
       <Gui />
     </React.Fragment>

@@ -27,7 +27,7 @@ const Gui = (): React.ReactElement => {
   };
 
   return (
-    <div className="gui">
+    <div className="absolute left-0 top-28 w-72 p-2 bg-white bg-opacity-10 flex flex-col gap-1">
       <Slider
         min={1}
         max={10_100_000}
@@ -59,7 +59,9 @@ const Gui = (): React.ReactElement => {
         labelText={`Force: ${computePropertiesState.force.toFixed(2)}`}
       />
       <ChromePicker color={computePropertiesState.color} onChange={onColorChange} />
-      <button onClick={onReset}>Reset to default values</button>
+      <button className="my-2 rounded bg-red-500 hover:bg-red-700 py-1 px-4 text-white" onClick={onReset}>
+        Reset to default values
+      </button>
       <div className="descriptionItem">
         <span>Space: activate force</span>
       </div>

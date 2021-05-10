@@ -2,17 +2,19 @@ import React from 'react';
 
 const ErrorMessage = (): React.ReactElement => {
   return (
-    <div className="error">
+    <div className="text-red-600 text-xl font-bold p-5">
       Your browser does not support WebGPU yet{' '}
-      <a href="https://github.com/gpuweb/gpuweb/wiki/Implementation-Status">(Implementation Status)</a>
+      <a className="underline" href="https://github.com/gpuweb/gpuweb/wiki/Implementation-Status">
+        (Implementation Status)
+      </a>
       <br />
       If you want to try this out:
-      <ul>
+      <ul className="list-disc list-inside">
         <li>In Chrome enable a flag: chrome://flags/#enable-unsafe-webgpu</li>
       </ul>
       <br />
       Additional information:
-      <ul>
+      <ul className="list-disc list-inside">
         <li>
           <a href="https://github.com/gpuweb/gpuweb">Github repo</a>
         </li>

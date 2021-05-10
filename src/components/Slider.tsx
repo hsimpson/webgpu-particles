@@ -19,6 +19,7 @@ const Slider = (props: SliderProps): React.ReactElement => {
         {props.labelText || ''}
         <br />
         <input
+          className="w-full"
           type="range"
           min={props.min}
           max={props.max}
