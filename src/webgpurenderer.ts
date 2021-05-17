@@ -25,8 +25,9 @@ export default class WebGPURenderer {
 
   private _colorTextureView: GPUTextureView;
   private _depthTextureView: GPUTextureView;
+  // FIXME: remove *New from the type when the Old deprecated types are removed
   private _colorAttachment: GPURenderPassColorAttachmentNew;
-  private _depthAttachment: GPURenderPassDepthStencilAttachmentNew;
+  private _depthAttachment: GPURenderPassDepthStencilAttachment;
 
   private _camera: Camera;
 
@@ -67,7 +68,7 @@ export default class WebGPURenderer {
 
     this._context = new WebGPURenderContext(this._canvas, this._device, this._queue);
 
-    const context: GPUCanvasContext = (this._canvas.getContext('gpupresent') as unknown) as GPUCanvasContext;
+    const context: GPUCanvasContext = this._canvas.getContext('gpupresent') as unknown as GPUCanvasContext;
     const swapChainDesc: GPUSwapChainDescriptor = {
       device: this._device,
       format: this._options.colorFormat,

@@ -39,7 +39,8 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
 
     const primitiveState: GPUPrimitiveState = {
       topology: this._options.primitiveTopology,
-      // stripIndexFormat: // TODO
+      // TODO: handle stripIndexFormat
+      // stripIndexFormat:
       frontFace: 'cw',
       cullMode: 'none',
     };
@@ -98,7 +99,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
       bindGroupLayouts: [bindGroupLayout],
     });
 
-    const pipelineDesc: GPURenderPipelineDescriptorNew = {
+    const pipelineDesc: GPURenderPipelineDescriptor = {
       layout,
       vertex: vertexState,
       primitive: primitiveState,
