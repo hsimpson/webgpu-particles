@@ -1,13 +1,10 @@
 [[block]] struct Color {
-  [[offset(0)]] color : vec4<f32>;
+  color : vec4<f32>;
 };
 
-[[group(0), binding(2)]] var<uniform> color : Color;
-
-[[location(0)]] var<out> outColor : vec4<f32>;
+[[group(0), binding(2)]] var<uniform> unforms : Color;
 
 [[stage(fragment)]]
-fn main() -> void {
-  outColor = color.color;
-  return;
+fn main() -> [[location(0)]] vec4<f32> {
+  return unforms.color;
 }
