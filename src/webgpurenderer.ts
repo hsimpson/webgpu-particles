@@ -21,12 +21,11 @@ export default class WebGPURenderer {
 
   private _meshes: WebGPUMesh[] = [];
 
-  private _swapchain: GPUSwapChain;
+  private _presentationContext: GPUPresentationContext;
 
   private _colorTextureView: GPUTextureView;
   private _depthTextureView: GPUTextureView;
-  // FIXME: remove *New from the type when the Old deprecated types are removed
-  private _colorAttachment: GPURenderPassColorAttachmentNew;
+  private _colorAttachment: GPURenderPassColorAttachment;
   private _depthAttachment: GPURenderPassDepthStencilAttachment;
 
   private _camera: Camera;
@@ -68,13 +67,13 @@ export default class WebGPURenderer {
 
     this._context = new WebGPURenderContext(this._canvas, this._device, this._queue);
 
-    const context: GPUCanvasContext = this._canvas.getContext('gpupresent') as unknown as GPUCanvasContext;
-    const swapChainDesc: GPUSwapChainDescriptor = {
+    this._presentationContext = this._canvas.getContext('gpupresent');
+    const presentationConfiguration: GPUPresentationConfiguration = {
       device: this._device,
       format: this._options.colorFormat,
       usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
     };
-    this._swapchain = context.configureSwapChain(swapChainDesc);
+    this._presentationContext.configure(presentationConfiguration);
   }
 
   private reCreateSwapChain(): void {
@@ -153,9 +152,9 @@ export default class WebGPURenderer {
   private renderPass(): void {
     if (this._options.sampleCount > 1) {
       this._colorAttachment.view = this._colorTextureView;
-      this._colorAttachment.resolveTarget = this._swapchain.getCurrentTexture().createView();
+      this._colorAttachment.resolveTarget = this._presentationContext.getCurrentTexture().createView();
     } else {
-      this._colorAttachment.view = this._swapchain.getCurrentTexture().createView();
+      this._colorAttachment.view = this._presentationContext.getCurrentTexture().createView();
     }
 
     const renderPassDesc: GPURenderPassDescriptor = {
