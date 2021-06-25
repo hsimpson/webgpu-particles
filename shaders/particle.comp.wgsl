@@ -16,8 +16,8 @@
 };
 
 [[group(0), binding(0)]] var<uniform> params : ComputeParams;
-[[group(0), binding(1)]] var<storage> positions : [[access(read_write)]] ParticlesA;
-[[group(0), binding(2)]] var<storage> velocities : [[access(read_write)]] ParticlesB;
+[[group(0), binding(1)]] var<storage, read_write> positions : ParticlesA;
+[[group(0), binding(2)]] var<storage, read_write> velocities : ParticlesB;
 
 let EPSILON: vec3<f32> = vec3<f32>(0.0001, 0.0001, 0.0001);
 
