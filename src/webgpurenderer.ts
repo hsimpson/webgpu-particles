@@ -143,7 +143,8 @@ export default class WebGPURenderer {
     const passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
     passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
-    passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
+    // passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
+    passEncoder.dispatch(Math.ceil(this._computePipeLine.particleCount / 64));
     passEncoder.endPass();
 
     this._queue.submit([commandEncoder.finish()]);
