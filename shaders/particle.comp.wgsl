@@ -21,7 +21,7 @@
 
 let EPSILON: vec3<f32> = vec3<f32>(0.0001, 0.0001, 0.0001);
 
-[[stage(compute)]]
+[[stage(compute), workgroup_size(64)]]
 fn main([[builtin(global_invocation_id)]] GlobalInvocationID : vec3<u32>) {
 
   var index: u32 = GlobalInvocationID.x;
