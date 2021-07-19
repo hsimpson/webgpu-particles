@@ -8,25 +8,24 @@ import WebGPUComputePipline from './webgpucomputepipline';
 
 interface WebGPURendererOptions {
   sampleCount?: number;
-  colorFormat?: GPUTextureFormat;
-  depthFormat?: GPUTextureFormat;
 }
 
 export default class WebGPURenderer {
   private _canvas: HTMLCanvasElement;
-  private _adapter: GPUAdapter;
-  private _device: GPUDevice;
-  private _queue: GPUQueue;
+
   private _context: WebGPURenderContext;
 
   private _meshes: WebGPUMesh[] = [];
 
   private _presentationContext: GPUPresentationContext;
+  private _presentationSize: GPUExtent3DStrict;
+  private _presentationFormat: GPUTextureFormat;
 
-  private _colorTextureView: GPUTextureView;
-  private _depthTextureView: GPUTextureView;
-  private _colorAttachment: GPURenderPassColorAttachment;
-  private _depthAttachment: GPURenderPassDepthStencilAttachment;
+  private _renderTarget: GPUTexture;
+  private _renderTargetView: GPUTextureView;
+
+  private _depthTarget: GPUTexture;
+  private _depthTargetView: GPUTextureView;
 
   private _camera: Camera;
 
@@ -39,8 +38,6 @@ export default class WebGPURenderer {
     this._camera = camera;
     const defaultOptions: WebGPURendererOptions = {
       sampleCount: 1,
-      colorFormat: 'bgra8unorm',
-      depthFormat: 'depth24plus-stencil8',
     };
 
     this._options = { ...defaultOptions, ...settings };
@@ -59,66 +56,66 @@ export default class WebGPURenderer {
       throw new Error('No WebGPU support navigator.gpu not available!');
     }
 
-    this._adapter = await gpu.requestAdapter();
+    const adapter = await gpu.requestAdapter();
 
-    this._device = await this._adapter.requestDevice();
+    const device = await adapter.requestDevice();
 
-    this._queue = this._device.queue;
+    const queue = device.queue;
 
-    this._context = new WebGPURenderContext(this._canvas, this._device, this._queue);
+    this._context = new WebGPURenderContext(this._canvas, device, queue);
 
-    this._presentationContext = this._canvas.getContext('gpupresent');
-    const presentationConfiguration: GPUPresentationConfiguration = {
-      device: this._device,
-      format: this._options.colorFormat,
-      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-    };
-    this._presentationContext.configure(presentationConfiguration);
-  }
-
-  private reCreateSwapChain(): void {
-    const textureSize: GPUExtent3D = {
-      width: this._canvas.width,
-      height: this._canvas.height,
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    this._presentationSize = {
+      width: this._canvas.clientWidth * devicePixelRatio,
+      height: this._canvas.clientWidth * devicePixelRatio,
       depthOrArrayLayers: 1,
     };
 
-    const depthTextureDesc: GPUTextureDescriptor = {
-      size: textureSize,
-      //arrayLayerCount: 1, // FIXME: possible move to GPUTextureViewDescriptor?!
-      mipLevelCount: 1,
-      sampleCount: this._options.sampleCount,
-      dimension: '2d',
-      format: this._options.depthFormat,
-      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+    this._presentationContext = this._canvas.getContext('gpupresent');
+    this._presentationFormat = this._presentationContext.getPreferredFormat(adapter);
+
+    this._presentationContext.configure({
+      device: this._context.device,
+      format: this._presentationFormat,
+      size: this._presentationSize,
+    });
+  }
+
+  private reCreateSwapChain(): void {
+    if (this._renderTarget !== undefined) {
+      this._renderTarget.destroy();
+      this._depthTarget.destroy();
+    }
+
+    this._presentationSize = {
+      width: this._canvas.clientWidth * devicePixelRatio,
+      height: this._canvas.clientWidth * devicePixelRatio,
+      depthOrArrayLayers: 1,
     };
 
-    const depthTexture = this._device.createTexture(depthTextureDesc);
-    this._depthTextureView = depthTexture.createView();
+    this._presentationContext.configure({
+      device: this._context.device,
+      format: this._presentationFormat,
+      size: this._presentationSize,
+    });
 
-    const colorTextureDesc: GPUTextureDescriptor = {
-      size: textureSize,
+    /* render target */
+    this._renderTarget = this._context.device.createTexture({
+      size: this._presentationSize,
       sampleCount: this._options.sampleCount,
-      format: this._options.colorFormat,
+      format: this._presentationFormat,
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
-    };
+    });
+    this._renderTargetView = this._renderTarget.createView();
 
-    const colorTexture = this._device.createTexture(colorTextureDesc);
-    this._colorTextureView = colorTexture.createView();
-
-    this._colorAttachment = {
-      view: null,
-      loadValue: { r: 0, g: 0, b: 0, a: 1 },
-      storeOp: 'store',
-    };
-
-    this._depthAttachment = {
-      view: this._depthTextureView,
-      depthLoadValue: 1,
-      depthStoreOp: 'store',
-      stencilLoadValue: 'load',
-      stencilStoreOp: 'store',
-    };
+    /* depth target */
+    this._depthTarget = this._context.device.createTexture({
+      size: this._presentationSize,
+      sampleCount: this._options.sampleCount,
+      format: 'depth24plus-stencil8',
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+    });
+    this._depthTargetView = this._depthTarget.createView();
   }
 
   private async initializeResources(): Promise<void> {
@@ -137,7 +134,7 @@ export default class WebGPURenderer {
   }
 
   private computePass(deltaTime: number): void {
-    const commandEncoder = this._device.createCommandEncoder();
+    const commandEncoder = this._context.device.createCommandEncoder();
 
     this._computePipeLine.deltaTime(deltaTime);
     const passEncoder = commandEncoder.beginComputePass();
@@ -147,23 +144,30 @@ export default class WebGPURenderer {
     passEncoder.dispatch(Math.ceil(this._computePipeLine.particleCount / 64));
     passEncoder.endPass();
 
-    this._queue.submit([commandEncoder.finish()]);
+    this._context.queue.submit([commandEncoder.finish()]);
   }
 
   private renderPass(): void {
-    if (this._options.sampleCount > 1) {
-      this._colorAttachment.view = this._colorTextureView;
-      this._colorAttachment.resolveTarget = this._presentationContext.getCurrentTexture().createView();
-    } else {
-      this._colorAttachment.view = this._presentationContext.getCurrentTexture().createView();
-    }
-
     const renderPassDesc: GPURenderPassDescriptor = {
-      colorAttachments: [this._colorAttachment],
-      depthStencilAttachment: this._depthAttachment,
+      colorAttachments: [
+        {
+          view: this._renderTargetView,
+          resolveTarget: this._presentationContext.getCurrentTexture().createView(),
+          loadValue: { r: 0, g: 0, b: 0, a: 1 },
+          storeOp: 'store',
+        },
+      ],
+      depthStencilAttachment: {
+        view: this._depthTargetView,
+
+        depthLoadValue: 1.0,
+        depthStoreOp: 'store',
+        stencilLoadValue: 0,
+        stencilStoreOp: 'store',
+      },
     };
 
-    const commandEncoder = this._device.createCommandEncoder();
+    const commandEncoder = this._context.device.createCommandEncoder();
     const passEncoder = commandEncoder.beginRenderPass(renderPassDesc);
 
     for (const mesh of this._meshes) {
@@ -185,11 +189,18 @@ export default class WebGPURenderer {
     /**/
     passEncoder.endPass();
 
-    this._queue.submit([commandEncoder.finish()]);
+    this._context.queue.submit([commandEncoder.finish()]);
   }
 
   public resize(): void {
-    this.reCreateSwapChain();
+    const devicePixelRatio = window.devicePixelRatio || 1;
+
+    if (
+      this._canvas.clientWidth * devicePixelRatio !== this._presentationSize[0] ||
+      this._canvas.clientHeight * devicePixelRatio !== this._presentationSize[1]
+    ) {
+      this.reCreateSwapChain();
+    }
   }
 
   public render = (deltaTime: number): void => {
