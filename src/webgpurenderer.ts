@@ -148,15 +148,20 @@ export default class WebGPURenderer {
   }
 
   private renderPass(): void {
+    const colorAttachment: GPURenderPassColorAttachment = {
+      view: this._presentationContext.getCurrentTexture().createView(),
+      // view: this._renderTargetView,
+      loadValue: { r: 0, g: 0, b: 0, a: 1 },
+      storeOp: 'store',
+    };
+
+    if (this._options.sampleCount > 1) {
+      colorAttachment.view = this._renderTargetView;
+      colorAttachment.resolveTarget = this._presentationContext.getCurrentTexture().createView();
+    }
+
     const renderPassDesc: GPURenderPassDescriptor = {
-      colorAttachments: [
-        {
-          view: this._renderTargetView,
-          resolveTarget: this._presentationContext.getCurrentTexture().createView(),
-          loadValue: { r: 0, g: 0, b: 0, a: 1 },
-          storeOp: 'store',
-        },
-      ],
+      colorAttachments: [colorAttachment],
       depthStencilAttachment: {
         view: this._depthTargetView,
 
