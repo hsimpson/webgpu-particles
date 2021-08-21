@@ -17,7 +17,7 @@ export default class WebGPURenderer {
 
   private _meshes: WebGPUMesh[] = [];
 
-  private _presentationContext: GPUPresentationContext;
+  private _presentationContext: GPUCanvasContext;
   private _presentationSize: GPUExtent3DStrict;
   private _presentationFormat: GPUTextureFormat;
 
@@ -71,7 +71,7 @@ export default class WebGPURenderer {
       depthOrArrayLayers: 1,
     };
 
-    this._presentationContext = this._canvas.getContext('gpupresent');
+    this._presentationContext = this._canvas.getContext('webgpu');
     this._presentationFormat = this._presentationContext.getPreferredFormat(adapter);
 
     this._presentationContext.configure({
