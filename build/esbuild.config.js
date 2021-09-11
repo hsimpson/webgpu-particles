@@ -1,5 +1,4 @@
 const esbuild = require('esbuild');
-const postCssPlugin = require('esbuild-postcss');
 const fs = require('fs');
 const fsExtra = require('fs-extra');
 
