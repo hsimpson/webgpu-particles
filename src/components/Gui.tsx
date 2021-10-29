@@ -27,7 +27,7 @@ const Gui = (): React.ReactElement => {
   };
 
   return (
-    <div className="absolute left-0 top-28 w-72 p-2 bg-white bg-opacity-10 flex flex-col gap-1">
+    <div className="absolute left-0 top-28 w-72 p-2 bg-white bg-opacity-10 flex flex-col gap-1 text-gray-200">
       <Slider
         min={1}
         max={10_100_000}
