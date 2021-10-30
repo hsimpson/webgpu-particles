@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [15]
+        node: [16]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
