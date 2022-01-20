@@ -1,4 +1,4 @@
-[[block]] struct ComputeParams {
+struct ComputeParams {
   vHalfBounding : vec4<f32>;
   vForcePos : vec4<f32>;
   fDeltaTime: f32;
@@ -7,11 +7,11 @@
   fForceOn: f32;
 };
 
-[[block]] struct ParticlesA {
+struct ParticlesA {
   pos : [[stride(16)]] array<vec4<f32>>;
 };
 
-[[block]] struct ParticlesB {
+struct ParticlesB {
   vel : [[stride(16)]] array<vec4<f32>>;
 };
 
@@ -41,7 +41,7 @@ fn main([[builtin(global_invocation_id)]] GlobalInvocationID : vec3<u32>) {
   if (position.x < -v3BB_half.x) {  // LEFT
     position.x = -2.0 * v3BB_half.x - position.x;
     velocity.x = velocity.x * -0.9;
-  } elseif (position.x > v3BB_half.x) {  // RIGHT
+  } else if (position.x > v3BB_half.x) {  // RIGHT
     position.x = 2.0 * v3BB_half.x - position.x;
     velocity.x = velocity.x * -0.9;
   }
@@ -52,7 +52,7 @@ fn main([[builtin(global_invocation_id)]] GlobalInvocationID : vec3<u32>) {
       velocity.y = velocity.y * -0.45;  // if its on the bottom we extra dampen
     }
     velocity.x = velocity.x * 0.9;
-  } elseif (position.y > v3BB_half.y) {  // TOP
+  } else if (position.y > v3BB_half.y) {  // TOP
     position.y = 2.0 * v3BB_half.y - position.y;
     if(params.fGravity < 0.0) {
       velocity.y = velocity.y * 0.45;  // if its on the top we extra dampen
@@ -63,7 +63,7 @@ fn main([[builtin(global_invocation_id)]] GlobalInvocationID : vec3<u32>) {
   if (position.z < -v3BB_half.z) {  // FRONT
     position.z = -2.0 * v3BB_half.z - position.z;
     velocity.z = velocity.z * -0.9;
-  } elseif (position.z > v3BB_half.z) {  // BACK
+  } else if (position.z > v3BB_half.z) {  // BACK
     position.z = 2.0 * v3BB_half.z - position.z;
     velocity.z = velocity.z * -0.9;
   }

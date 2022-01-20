@@ -1,4 +1,4 @@
-[[block]] struct Color {
+struct Color {
   color : vec4<f32>;
 };
 
