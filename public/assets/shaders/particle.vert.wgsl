@@ -1,9 +1,9 @@
-[[block]] struct UBOCamera {
+struct UBOCamera {
   viewMatrix : mat4x4<f32>;
   projMatrix : mat4x4<f32>;
 };
 
-[[block]] struct UBOModel {
+struct UBOModel {
   modelMatrix : mat4x4<f32>;
 };
 
