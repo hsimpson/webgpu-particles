@@ -1,10 +1,10 @@
-struct Color {
-  color : vec4<f32>;
+struct UBOParticle {
+  color: vec4<f32>;
 };
 
-[[group(0), binding(2)]] var<uniform> unforms : Color;
+@group(0) @binding(2) var<uniform> particles: UBOParticle;
 
-[[stage(fragment)]]
-fn main() -> [[location(0)]] vec4<f32> {
-  return unforms.color;
+@stage(fragment)
+fn main() -> @location(0) vec4<f32> {
+  return particles.color;
 }
