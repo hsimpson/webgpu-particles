@@ -19,7 +19,7 @@ module.exports = {
   parserOptions: {
     project: './tsconfig.json',
   },
-  plugins: ['@typescript-eslint', 'react', 'import' /*'deprecation'*/],
+  plugins: ['@typescript-eslint', 'react', 'import', 'deprecation'],
   rules: {
     '@typescript-eslint/explicit-function-return-type': [
       'warn',
@@ -50,7 +50,7 @@ module.exports = {
     '@typescript-eslint/promise-function-async': 'error',
     '@typescript-eslint/require-await': 'error',
     eqeqeq: 'error',
-    // "deprecation/deprecation": "warn",
+    'deprecation/deprecation': 'warn',
     'import/no-deprecated': 'warn',
     'import/no-unresolved': 'error',
     indent: [

@@ -21,7 +21,7 @@ struct ParticlesB {
 
 let EPSILON: vec3<f32> = vec3<f32>(0.0001, 0.0001, 0.0001);
 
-@stage(compute) @workgroup_size(64)
+@stage(compute) @workgroup_size(256)
 fn main(@builtin(global_invocation_id) globalInvocationID: vec3<u32>) {
 
   var index: u32 = globalInvocationID.x;
@@ -51,7 +51,7 @@ fn main(@builtin(global_invocation_id) globalInvocationID: vec3<u32>) {
     if(params.fGravity > 0.0) {
       velocity.y = velocity.y * -0.45;  // if its on the bottom we extra dampen
     }
-    velocity.x = velocity.x * 0.9;
+    velocity.y = velocity.y * 0.9;
   } else if (position.y > v3BB_half.y) {  // TOP
     position.y = 2.0 * v3BB_half.y - position.y;
     if(params.fGravity < 0.0) {

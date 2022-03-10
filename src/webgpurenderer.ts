@@ -57,6 +57,7 @@ export default class WebGPURenderer {
     }
 
     const adapter = await gpu.requestAdapter();
+    console.log(adapter.limits);
 
     const device = await adapter.requestDevice();
 
@@ -141,8 +142,8 @@ export default class WebGPURenderer {
     passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
     passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
     // passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
-    passEncoder.dispatch(Math.ceil(this._computePipeLine.particleCount / 64));
-    passEncoder.endPass();
+    passEncoder.dispatch(Math.ceil(this._computePipeLine.particleCount / 256));
+    passEncoder.end();
 
     this._context.queue.submit([commandEncoder.finish()]);
   }
@@ -150,8 +151,7 @@ export default class WebGPURenderer {
   private renderPass(): void {
     const colorAttachment: GPURenderPassColorAttachment = {
       view: this._presentationContext.getCurrentTexture().createView(),
-      // view: this._renderTargetView,
-      loadValue: { r: 0, g: 0, b: 0, a: 1 },
+      loadOp: 'clear',
       storeOp: 'store',
     };
 
@@ -165,9 +165,14 @@ export default class WebGPURenderer {
       depthStencilAttachment: {
         view: this._depthTargetView,
 
-        depthLoadValue: 1.0,
+        // TODO: check https://github.com/gund/eslint-plugin-deprecation/issues/13
+        // depthLoadValue: 1.0,
+        depthLoadOp: 'clear',
+        depthClearValue: 1.0,
         depthStoreOp: 'store',
-        stencilLoadValue: 0,
+
+        stencilLoadOp: 'clear',
+        stencilClearValue: 0,
         stencilStoreOp: 'store',
       },
     };
@@ -192,7 +197,7 @@ export default class WebGPURenderer {
       }
     }
     /**/
-    passEncoder.endPass();
+    passEncoder.end();
 
     this._context.queue.submit([commandEncoder.finish()]);
   }
