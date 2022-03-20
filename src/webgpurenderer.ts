@@ -68,7 +68,7 @@ export default class WebGPURenderer {
     const devicePixelRatio = window.devicePixelRatio || 1;
     this._presentationSize = {
       width: this._canvas.clientWidth * devicePixelRatio,
-      height: this._canvas.clientWidth * devicePixelRatio,
+      height: this._canvas.clientHeight * devicePixelRatio,
       depthOrArrayLayers: 1,
     };
 
@@ -90,7 +90,7 @@ export default class WebGPURenderer {
 
     this._presentationSize = {
       width: this._canvas.clientWidth * devicePixelRatio,
-      height: this._canvas.clientWidth * devicePixelRatio,
+      height: this._canvas.clientHeight * devicePixelRatio,
       depthOrArrayLayers: 1,
     };
 
