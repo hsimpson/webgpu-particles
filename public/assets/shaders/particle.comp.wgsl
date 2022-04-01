@@ -1,18 +1,18 @@
 struct ComputeParams {
-  vHalfBounding: vec4<f32>;
-  vForcePos: vec4<f32>;
-  fDeltaTime: f32;
-  fGravity: f32;
-  fForce: f32;
-  fForceOn: f32;
+  vHalfBounding: vec4<f32>,
+  vForcePos: vec4<f32>,
+  fDeltaTime: f32,
+  fGravity: f32,
+  fForce: f32,
+  fForceOn: f32,
 };
 
 struct ParticlesA {
-  pos: array<vec4<f32>>;
+  pos: array<vec4<f32>>,
 };
 
 struct ParticlesB {
-  vel: array<vec4<f32>>;
+  vel: array<vec4<f32>>,
 };
 
 @group(0) @binding(0) var<uniform> params: ComputeParams;

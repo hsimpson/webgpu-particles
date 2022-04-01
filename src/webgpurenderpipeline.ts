@@ -37,10 +37,14 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     }
     this._initialized = true;
 
+    let stripIndexFormat = undefined;
+    if (this._options.primitiveTopology === 'triangle-strip' || this._options.primitiveTopology === 'line-strip') {
+      stripIndexFormat = 'uint16';
+    }
+
     const primitiveState: GPUPrimitiveState = {
       topology: this._options.primitiveTopology,
-      // TODO: handle stripIndexFormat
-      // stripIndexFormat:
+      stripIndexFormat: stripIndexFormat,
       frontFace: 'cw',
       cullMode: 'none',
     };

@@ -1,5 +1,5 @@
 struct UBOParticle {
-  color: vec4<f32>;
+  color: vec4<f32>,
 };
 
 @group(0) @binding(2) var<uniform> particles: UBOParticle;

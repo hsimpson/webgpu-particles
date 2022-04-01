@@ -74,12 +74,6 @@ export default class WebGPURenderer {
 
     this._presentationContext = this._canvas.getContext('webgpu');
     this._presentationFormat = this._presentationContext.getPreferredFormat(adapter);
-
-    this._presentationContext.configure({
-      device: this._context.device,
-      format: this._presentationFormat,
-      size: this._presentationSize,
-    });
   }
 
   private reCreateSwapChain(): void {
@@ -98,6 +92,7 @@ export default class WebGPURenderer {
       device: this._context.device,
       format: this._presentationFormat,
       size: this._presentationSize,
+      compositingAlphaMode: 'opaque',
     });
 
     /* render target */
