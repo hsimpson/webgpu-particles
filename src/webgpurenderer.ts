@@ -73,7 +73,13 @@ export default class WebGPURenderer {
     };
 
     this._presentationContext = this._canvas.getContext('webgpu');
-    this._presentationFormat = this._presentationContext.getPreferredFormat(adapter);
+    this._presentationFormat = gpu.getPreferredCanvasFormat();
+
+    this._presentationContext.configure({
+      device: this._context.device,
+      format: this._presentationFormat,
+      alphaMode: 'opaque',
+    });
   }
 
   private reCreateSwapChain(): void {
@@ -87,13 +93,6 @@ export default class WebGPURenderer {
       height: this._canvas.clientHeight * devicePixelRatio,
       depthOrArrayLayers: 1,
     };
-
-    this._presentationContext.configure({
-      device: this._context.device,
-      format: this._presentationFormat,
-      size: this._presentationSize,
-      compositingAlphaMode: 'opaque',
-    });
 
     /* render target */
     this._renderTarget = this._context.device.createTexture({
@@ -137,7 +136,7 @@ export default class WebGPURenderer {
     passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
     passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
     // passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
-    passEncoder.dispatch(Math.ceil(this._computePipeLine.particleCount / 256));
+    passEncoder.dispatchWorkgroups(Math.ceil(this._computePipeLine.particleCount / 256));
     passEncoder.end();
 
     this._context.queue.submit([commandEncoder.finish()]);

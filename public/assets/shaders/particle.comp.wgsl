@@ -19,9 +19,9 @@ struct ParticlesB {
 @group(0) @binding(1) var<storage, read_write> positions: ParticlesA;
 @group(0) @binding(2) var<storage, read_write> velocities: ParticlesB;
 
-let EPSILON: vec3<f32> = vec3<f32>(0.0001, 0.0001, 0.0001);
+const EPSILON: vec3<f32> = vec3<f32>(0.0001, 0.0001, 0.0001);
 
-@stage(compute) @workgroup_size(256)
+@compute @workgroup_size(256)
 fn main(@builtin(global_invocation_id) globalInvocationID: vec3<u32>) {
 
   var index: u32 = globalInvocationID.x;

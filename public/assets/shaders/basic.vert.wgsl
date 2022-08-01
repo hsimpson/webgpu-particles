@@ -21,7 +21,7 @@ struct VertexOutput {
 };
 
 
-@stage(vertex)
+@vertex
 fn main(vertexInput: VertexInput) -> VertexOutput {
   var vertexOutput: VertexOutput;
   vertexOutput.position = camera.projMatrix * camera.viewMatrix * model.modelMatrix * vec4<f32>(vertexInput.inPosition, 1.0);
