@@ -1,4 +1,5 @@
-import { vec3, vec4 } from 'gl-matrix';
+import Vec3 from 'wgpu-matrix/dist/2.x/vec3-impl';
+import Vec4 from 'wgpu-matrix/dist/2.x/vec4-impl';
 import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
 
 /* the cube:
@@ -16,8 +17,8 @@ import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
 
 */
 
-const BoxDimensions: vec3 = [8, 5, 5];
-const color: vec4 = [1, 1, 1, 1];
+const BoxDimensions: Vec3 = [8, 5, 5];
+const color: Vec4 = [1, 1, 1, 1];
 
 const halfx = BoxDimensions[0] / 2;
 const halfy = BoxDimensions[1] / 2;

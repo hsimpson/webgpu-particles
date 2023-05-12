@@ -1,10 +1,13 @@
-import { vec3, mat4, quat, glMatrix } from 'gl-matrix';
-import WebGPURenderContext from './webgpurendercontext';
+import { mat4, vec3 } from 'wgpu-matrix';
+import type Mat4 from 'wgpu-matrix/dist/2.x/mat4-impl';
+import { degToRad } from 'wgpu-matrix/dist/2.x/utils';
+import type Vec3 from 'wgpu-matrix/dist/2.x/vec3-impl';
 import { createBuffer } from './webgpuhelpers';
+import WebGPURenderContext from './webgpurendercontext';
 
 export default class Camera {
-  private _perspectiveMatrix = mat4.create();
-  private _viewMatrix = mat4.create();
+  private _perspectiveMatrix: Mat4 = mat4.identity();
+  private _viewMatrix = mat4.identity();
   private _rotation = quat.create();
 
   private _uniformBuffer: GPUBuffer;
@@ -15,9 +18,9 @@ export default class Camera {
   private _initialized = false;
   private _context: WebGPURenderContext;
 
-  public position: vec3 = vec3.create();
-  public target: vec3 = vec3.create();
-  public up: vec3 = [0, 1, 0];
+  public position: Vec3 = vec3.create(0, 0, 0);
+  public target: Vec3 = vec3.create(0, 0, 0);
+  public up: Vec3 = vec3.create(0, 1, 0);
   public fovY = 45.0;
   public aspectRatio = 1.0;
   public zNear = 0.1;
@@ -43,11 +46,11 @@ export default class Camera {
     this._uniformBuffer = createBuffer(context.device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
   }
 
-  public get viewMatrix(): mat4 {
+  public get viewMatrix() {
     return this._viewMatrix;
   }
 
-  public get perspectiveMatrix(): mat4 {
+  public get perspectiveMatrix() {
     return this._perspectiveMatrix;
   }
 
@@ -74,7 +77,7 @@ export default class Camera {
   private updatePerspectiveMatrix(): void {
     this._perspectiveMatrix = mat4.perspective(
       this._perspectiveMatrix,
-      glMatrix.toRadian(this.fovY),
+      degToRad(this.fovY),
       this.aspectRatio,
       this.zNear,
       this.zFar

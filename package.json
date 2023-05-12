@@ -51,10 +51,10 @@
     "vite": "^4.3.5"
   },
   "dependencies": {
-    "gl-matrix": "^3.4.3",
     "react": "^18.2.0",
     "react-color": "^2.18.1",
     "react-dom": "^18.2.0",
-    "recoil": "0.7.7"
+    "recoil": "0.7.7",
+    "wgpu-matrix": "^2.1.0"
   }
 }
