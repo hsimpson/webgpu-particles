@@ -1,6 +1,6 @@
-import WebGPURenderContext from './webgpurendercontext';
-import { vec4 } from 'gl-matrix';
+import { Vec4 } from 'wgpu-matrix';
 import { createBuffer } from './webgpuhelpers';
+import WebGPURenderContext from './webgpurendercontext';
 
 export default class WebGPUMaterial {
   private _uniformBuffer: GPUBuffer;
@@ -8,11 +8,11 @@ export default class WebGPUMaterial {
   private _bindGroupEntries: GPUBindGroupEntry[] = [];
 
   private _initialized = false;
-  private _color: vec4;
+  private _color: Vec4;
 
   private _context: WebGPURenderContext;
 
-  public constructor(color: vec4) {
+  public constructor(color: Vec4) {
     this._color = color;
   }
 
@@ -58,7 +58,7 @@ export default class WebGPUMaterial {
     return this._bindGroupEntries;
   }
 
-  public set color(color: vec4) {
+  public set color(color: Vec4) {
     this._color = color;
     this.updateUniformBuffer();
   }

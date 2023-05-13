@@ -552,10 +552,10 @@
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
 
-"@types/node@^20.1.1":
-  version "20.1.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.1.1.tgz#afc492e8dbe7f672dd3a13674823522b467a45ad"
-  integrity sha512-uKBEevTNb+l6/aCQaKVnUModfEMjAl98lw2Si9P5y4hLu9tm6AlX2ZIoXZX6Wh9lJueYPrGPKk5WMCNHg/u6/A==
+"@types/node@^20.1.3":
+  version "20.1.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.1.3.tgz#bc8e7cd8065a5fc355a3a191a68db8019c58bc00"
+  integrity sha512-NP2yfZpgmf2eDRPmgGq+fjGjSwFgYbihA8/gK+ey23qT9RkxsgNTZvGOEpXgzIGqesTYkElELLgtKoMQTys5vA==
 
 "@types/prop-types@*":
   version "15.7.4"
@@ -3387,10 +3387,10 @@ vite@^4.3.5:
   optionalDependencies:
     fsevents "~2.3.2"
 
-wgpu-matrix@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/wgpu-matrix/-/wgpu-matrix-2.1.0.tgz#be1b0eb7cd471f9af45964533a8620ad612e7839"
-  integrity sha512-6wy2ZEVrM4jFdGmAzAG27/Zynlcd3jbqh8u/1jKQKm01J9Rbr6t0E//Uju5TlVPQUpv6vSM0n/BQGF6xIyjJyQ==
+wgpu-matrix@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/wgpu-matrix/-/wgpu-matrix-2.2.1.tgz#6e6ba692023dbdb248f8f4247328ed391376f7d0"
+  integrity sha512-LiFL7N+MXAiBu6vFeIV3+iV5yPagksaP7jPQlsUdt4/NzmYx2DSNt8FBnJGTf5MHfw54rQX25DoiqhTk757TBA==
 
 which-boxed-primitive@^1.0.2:
   version "1.0.2"

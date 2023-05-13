@@ -4,7 +4,11 @@ const ErrorMessage = (): React.ReactElement => {
   return (
     <div className="text-red-600 text-xl font-bold p-5">
       Your browser does not support WebGPU yet{' '}
-      <a className="underline" href="https://github.com/gpuweb/gpuweb/wiki/Implementation-Status">
+      <a
+        className="underline"
+        target="_blank"
+        rel="noreferrer"
+        href="https://github.com/gpuweb/gpuweb/wiki/Implementation-Status">
         (Implementation Status)
       </a>
       <br />
@@ -16,10 +20,14 @@ const ErrorMessage = (): React.ReactElement => {
       Additional information:
       <ul className="list-disc list-inside">
         <li>
-          <a href="https://github.com/gpuweb/gpuweb">Github repo</a>
+          <a target="_blank" rel="noreferrer" href="https://github.com/gpuweb/gpuweb">
+            Github repo
+          </a>
         </li>
         <li>
-          <a href="https://en.wikipedia.org/wiki/WebGPU">Wikipedia article</a>
+          <a target="_blank" rel="noreferrer" href="https://en.wikipedia.org/wiki/WebGPU">
+            Wikipedia article
+          </a>
         </li>
       </ul>
     </div>

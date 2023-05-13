@@ -1,5 +1,4 @@
-import Vec3 from 'wgpu-matrix/dist/2.x/vec3-impl';
-import Vec4 from 'wgpu-matrix/dist/2.x/vec4-impl';
+import { Vec3, Vec4 } from 'wgpu-matrix';
 import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
 
 /* the cube:

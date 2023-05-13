@@ -1,14 +1,11 @@
-import { mat4, vec3 } from 'wgpu-matrix';
-import type Mat4 from 'wgpu-matrix/dist/2.x/mat4-impl';
-import { degToRad } from 'wgpu-matrix/dist/2.x/utils';
-import type Vec3 from 'wgpu-matrix/dist/2.x/vec3-impl';
+import { Quat, Vec3, mat4, quat, utils, vec3 } from 'wgpu-matrix';
 import { createBuffer } from './webgpuhelpers';
 import WebGPURenderContext from './webgpurendercontext';
 
 export default class Camera {
-  private _perspectiveMatrix: Mat4 = mat4.identity();
+  private _perspectiveMatrix = mat4.identity();
   private _viewMatrix = mat4.identity();
-  private _rotation = quat.create();
+  private _rotation = quat.identity();
 
   private _uniformBuffer: GPUBuffer;
   /*
@@ -64,24 +61,15 @@ export default class Camera {
   }
 
   private updateViewMatrix(): void {
-    const translationMatrix = mat4.create();
-    const rotationMatrix = mat4.create();
+    const translationMatrix = mat4.lookAt(this.position, this.target, this.up);
+    const rotationMatrix = mat4.fromQuat(this._rotation);
 
-    mat4.lookAt(translationMatrix, this.position, this.target, this.up);
-    mat4.fromQuat(rotationMatrix, this._rotation);
-
-    this._viewMatrix = mat4.multiply(this._viewMatrix, translationMatrix, rotationMatrix);
+    mat4.multiply(translationMatrix, rotationMatrix, this._viewMatrix);
     this.updateUniformBuffer();
   }
 
   private updatePerspectiveMatrix(): void {
-    this._perspectiveMatrix = mat4.perspective(
-      this._perspectiveMatrix,
-      degToRad(this.fovY),
-      this.aspectRatio,
-      this.zNear,
-      this.zFar
-    );
+    mat4.perspective(utils.degToRad(this.fovY), this.aspectRatio, this.zNear, this.zFar, this._perspectiveMatrix);
     this.updateUniformBuffer();
   }
 
@@ -92,14 +80,13 @@ export default class Camera {
     }
   }
 
-  public rotateQuat(rotation: quat): void {
-    this._rotation = quat.multiply(this._rotation, rotation, this._rotation);
+  public rotateQuat(rotation: Quat): void {
+    quat.multiply(rotation, this._rotation, this._rotation);
     this.updateViewMatrix();
   }
 
   public rotateEuler(angleX: number, angelY: number, angleZ: number): void {
-    let tempQuat = quat.create();
-    tempQuat = quat.fromEuler(tempQuat, angleX, angelY, angleZ);
+    const tempQuat = quat.fromEuler(angleX, angelY, angleZ, 'xzy');
     this.rotateQuat(tempQuat);
   }
 }
