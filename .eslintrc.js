@@ -21,18 +21,7 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'react', 'import', 'deprecation'],
   rules: {
-    '@typescript-eslint/explicit-function-return-type': [
-      'warn',
-      {
-        allowExpressions: true,
-      },
-    ],
-    '@typescript-eslint/explicit-member-accessibility': [
-      'error',
-      {
-        accessibility: 'explicit',
-      },
-    ],
+    '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'explicit' }],
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/no-parameter-properties': ['off'],
@@ -53,24 +42,12 @@ module.exports = {
     'deprecation/deprecation': 'warn',
     'import/no-deprecated': 'warn',
     'import/no-unresolved': 'error',
-    indent: [
-      'error',
-      2,
-      {
-        SwitchCase: 1,
-      },
-    ],
+    indent: ['error', 2, { SwitchCase: 1 }],
     'linebreak-style': ['error', 'unix'],
     'no-unused-vars': 'off',
     'no-warning-comments': 'warn',
     quotes: ['error', 'single'],
-    'react/self-closing-comp': [
-      'error',
-      {
-        component: true,
-        html: true,
-      },
-    ],
+    'react/self-closing-comp': ['error', { component: true, html: true }],
     semi: ['error', 'always'],
   },
   settings: {

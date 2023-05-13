@@ -1,14 +1,14 @@
-import WebGPURenderer from './webgpurenderer';
 import Camera from './camera';
+import WebGPURenderer from './webgpurenderer';
 //import { TriangleGeometry } from './trianglegeometry';
-import { BoxGeometry, BoxDimensions } from './boxgeometry';
+import { Vec2, vec2 } from 'wgpu-matrix';
+import { BoxDimensions, BoxGeometry } from './boxgeometry';
 import { CrossHairGeometry } from './crosshairgeometry';
 import ParticleGeometry from './particlegeometry';
-import WebGPUMesh from './webgpumesh';
-import { vec2 } from 'gl-matrix';
-import WebGPURenderPipeline from './webgpurenderpipeline';
 import WebGPUComputePipline from './webgpucomputepipline';
 import WebGPUMaterial from './webgpumaterial';
+import WebGPUMesh from './webgpumesh';
+import WebGPURenderPipeline from './webgpurenderpipeline';
 
 type FrameCallBackT = (frameTime: number, cpuTime: number) => void;
 
@@ -37,7 +37,7 @@ export default class ParticleRenderer {
   private _frameDurationAvg = 0;
   private _cpuDurationAvg = 0;
 
-  private _currentMousePos = vec2.create();
+  private _currentMousePos: Vec2 = vec2.create();
 
   private readonly _movementSpeed = 0.25;
 
@@ -219,16 +219,14 @@ export default class ParticleRenderer {
   };
 
   private onMouseMove = (event: MouseEvent): void => {
-    const currentPos: vec2 = [event.clientX, event.clientY];
+    const currentPos: Vec2 = [event.clientX, event.clientY];
     if (event.buttons === 1) {
-      let offset = vec2.create();
-      offset = vec2.subtract(offset, currentPos, this._currentMousePos);
-      offset = vec2.scale(offset, offset, 0.2);
+      const offset = vec2.subtract(currentPos, this._currentMousePos);
+      vec2.scale(offset, 0.0025, offset);
 
       //console.log(offset);
 
-      this._camera.rotateEuler(0.0, offset[0], 0.0);
-      this._camera.rotateEuler(offset[1], 0.0, 0.0);
+      this._camera.rotateEuler(offset[1], offset[0], 0.0);
     }
     this._currentMousePos = currentPos;
   };

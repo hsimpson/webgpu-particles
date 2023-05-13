@@ -1,10 +1,10 @@
-import WebGPURenderContext from './webgpurendercontext';
-import WebGPUPipelineBase from './webgpupipelinebase';
-import WebGPUMesh from './webgpumesh';
-import { createBuffer } from './webgpuhelpers';
+import { Vec3, Vec4, vec3 } from 'wgpu-matrix';
 import { BoxDimensions } from './boxgeometry';
-import { vec3, vec4 } from 'gl-matrix';
 import ParticleGeometry from './particlegeometry';
+import { createBuffer } from './webgpuhelpers';
+import WebGPUMesh from './webgpumesh';
+import WebGPUPipelineBase from './webgpupipelinebase';
+import WebGPURenderContext from './webgpurendercontext';
 
 interface WebGPUComputePiplineOptions {
   computeShaderUrl: string;
@@ -12,8 +12,8 @@ interface WebGPUComputePiplineOptions {
 }
 
 interface ComputeParams {
-  vHalfBounding: vec4;
-  vForcePos: vec4;
+  vHalfBounding: Vec4;
+  vForcePos: Vec4;
   fDeltaTime: number;
   fGravity: number;
   fForce: number;
@@ -43,8 +43,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
 
     this._options = options;
 
-    let halfBounding = vec3.clone(BoxDimensions);
-    halfBounding = vec3.scale(halfBounding, halfBounding, 0.5);
+    const halfBounding = vec3.scale(BoxDimensions, 0.5);
 
     this._computeParams = {
       vHalfBounding: [halfBounding[0], halfBounding[1], halfBounding[2], 1.0],
@@ -220,7 +219,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
     this.updateUniformBuffer();
   }
 
-  public set forcePostion(pos: vec3) {
+  public set forcePostion(pos: Vec3) {
     this._computeParams.vForcePos = [pos[0], pos[1], pos[2], 1.0];
     this.updateUniformBuffer();
   }

@@ -1,5 +1,5 @@
 import { BoxDimensions } from './boxgeometry';
-import { vec3 } from 'gl-matrix';
+import { vec3 } from 'wgpu-matrix';
 
 export function createBuffer(
   device: GPUDevice,
@@ -22,14 +22,12 @@ export function createBuffer(
 }
 
 export function createRandomParticles(count: number, elements: number): Float32Array {
-  const randomVector = (): vec3 => {
-    return [
+  const randomVector = () => {
+    return vec3.create(
       Math.random() * BoxDimensions[0] - BoxDimensions[0] / 2,
       Math.random() * BoxDimensions[1] - BoxDimensions[1] / 2,
-      //0,
-      Math.random() * BoxDimensions[2] - BoxDimensions[2] / 2,
-      //1.0,
-    ];
+      Math.random() * BoxDimensions[2] - BoxDimensions[2] / 2
+    );
   };
 
   // fill with random data
