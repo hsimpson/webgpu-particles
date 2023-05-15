@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/hsimpson/webgpu-particles#readme",
   "devDependencies": {
+    "@types/dom-webcodecs": "^0.1.7",
     "@types/node": "^20.1.3",
     "@types/react": "^18.2.6",
     "@types/react-color": "^3.0.6",

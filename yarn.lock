@@ -542,6 +542,11 @@
     tiny-glob "^0.2.9"
     tslib "^2.4.0"
 
+"@types/dom-webcodecs@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@types/dom-webcodecs/-/dom-webcodecs-0.1.7.tgz#29d3e7d4e0b9902676c599d74c1b6c15eafce714"
+  integrity sha512-1euwRyJ7rQrddOa24d5ZcoDRMp68xEIwyb7PKb3Wpc2OullUxHQ4a63WPa5V8R+KtCWISKjgS+f83HCUVhXS/w==
+
 "@types/json-schema@^7.0.9":
   version "7.0.9"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.9.tgz#97edc9037ea0c38585320b28964dde3b39e4660d"
