@@ -11,6 +11,6 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "target": "ES2022",
-    "typeRoots": ["./node_modules/@webgpu/types", "node_modules/@types"]
+    "typeRoots": ["./src/@types", "./node_modules/@webgpu/types", "node_modules/@types"]
   }
 }
