@@ -10,6 +10,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
+    "skipLibCheck": true,
     "target": "ES2022",
     "typeRoots": ["./src/@types", "./node_modules/@webgpu/types", "node_modules/@types"]
   }
