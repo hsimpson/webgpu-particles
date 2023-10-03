@@ -13,7 +13,7 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
-    'prettier',
+    'plugin:prettier/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -49,6 +49,7 @@ module.exports = {
     'linebreak-style': ['error', 'unix'],
     'no-unused-vars': 'off',
     'no-warning-comments': 'warn',
+    'prettier/prettier': 'error',
     quotes: ['error', 'single'],
     'react/self-closing-comp': ['error', { component: true, html: true }],
     semi: ['error', 'always'],
