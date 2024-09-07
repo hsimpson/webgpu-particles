@@ -53,7 +53,7 @@ export default class ParticleRenderer {
     this._canvas.height = this._canvas.offsetHeight * window.devicePixelRatio;
 
     this._camera = new Camera(45, this._canvas.width / this._canvas.height, 0.1, 1000);
-    this._camera.position = [0, 0, 15];
+    this._camera.position = new Float32Array([0, 0, 15]);
     //this._camera.position = [10, 5, 15];
     this._camera.updateMatrices();
 
@@ -95,7 +95,7 @@ export default class ParticleRenderer {
     this._crossHairMesh = new WebGPUMesh(CrossHairGeometry, crossHairPipeline);
     this._crossHairMesh.name = 'CrossHairMesh';
 
-    this._particleMaterial = new WebGPUMaterial([1.0, 0.0, 1.0, 0.5]);
+    this._particleMaterial = new WebGPUMaterial(new Float32Array([1.0, 0.0, 1.0, 0.5]));
     this._particleMesh = new WebGPUMesh(
       new ParticleGeometry(particleCount, 4),
       particlePipeline,
@@ -219,7 +219,7 @@ export default class ParticleRenderer {
   };
 
   private onMouseMove = (event: MouseEvent): void => {
-    const currentPos: Vec2 = [event.clientX, event.clientY];
+    const currentPos: Vec2 = new Float32Array([event.clientX, event.clientY]);
     if (event.buttons === 1) {
       const offset = vec2.subtract(currentPos, this._currentMousePos);
       vec2.scale(offset, 0.0025, offset);
@@ -280,8 +280,8 @@ export default class ParticleRenderer {
       z = this._crossHairMesh.position[2];
     }
 
-    this._crossHairMesh.position = [x, y, z];
-    this._computePipeLine.forcePostion = [x, y, z];
+    this._crossHairMesh.position = new Float32Array([x, y, z]);
+    this._computePipeLine.forcePostion = new Float32Array([x, y, z]);
   };
 
   private onKeyup = (event: KeyboardEvent): void => {

@@ -4,7 +4,7 @@ import WebGPUObjectBase from './webgpuobjectbase';
 export default abstract class WebGPUEntity extends WebGPUObjectBase {
   private _modelMatrix = mat4.identity();
   private _position = vec3.create();
-  private _scale: Vec3 = [1.0, 1.0, 1.0];
+  private _scale: Vec3 = new Float32Array([1.0, 1.0, 1.0]);
   private _rotation = quat.identity();
 
   public get modelMatrix(): Mat4 {

@@ -46,8 +46,8 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
     const halfBounding = vec3.scale(BoxDimensions, 0.5);
 
     this._computeParams = {
-      vHalfBounding: [halfBounding[0], halfBounding[1], halfBounding[2], 1.0],
-      vForcePos: [0, 0, 0, 1],
+      vHalfBounding: new Float32Array([halfBounding[0], halfBounding[1], halfBounding[2], 1.0]),
+      vForcePos: new Float32Array([0, 0, 0, 1]),
       fDeltaTime: 0.001,
       fGravity: 9.81, // 9.81 m/s² default earth gravity
       fForce: 20,
@@ -162,6 +162,8 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
       const val = this._computeParams[keys[i]];
       if (Array.isArray(val)) {
         array.push(...val);
+      } else if (val instanceof Float32Array) {
+        array.push(...val);
       } else {
         array.push(val);
       }
@@ -220,7 +222,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
   }
 
   public set forcePostion(pos: Vec3) {
-    this._computeParams.vForcePos = [pos[0], pos[1], pos[2], 1.0];
+    this._computeParams.vForcePos = new Float32Array([pos[0], pos[1], pos[2], 1.0]);
     this.updateUniformBuffer();
   }
 

@@ -1,11 +1,11 @@
 import { Vec3, Vec4 } from 'wgpu-matrix';
 import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
 
-const red: Vec4 = [1, 0, 0, 1];
-const green: Vec4 = [0, 1, 0, 1];
-const blue: Vec4 = [0, 0, 1, 1];
+const red: Vec4 = new Float32Array([1, 0, 0, 1]);
+const green: Vec4 = new Float32Array([0, 1, 0, 1]);
+const blue: Vec4 = new Float32Array([0, 0, 1, 1]);
 
-const CrossHairDimensions: Vec3 = [1, 1, 1];
+const CrossHairDimensions: Vec3 = new Float32Array([1, 1, 1]);
 
 const halfx = CrossHairDimensions[0] / 2;
 const halfy = CrossHairDimensions[1] / 2;

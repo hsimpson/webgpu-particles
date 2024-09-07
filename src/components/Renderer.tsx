@@ -50,12 +50,12 @@ const Renderer = (): React.ReactElement => {
     if (particlerenderer.current) {
       particlerenderer.current.computePipline.force = computePropertiesState.force;
       particlerenderer.current.computePipline.gravity = computePropertiesState.gravity;
-      particlerenderer.current.particleMaterial.color = [
+      particlerenderer.current.particleMaterial.color = new Float32Array([
         computePropertiesState.color.r / 255,
         computePropertiesState.color.g / 255,
         computePropertiesState.color.b / 255,
         computePropertiesState.color.a,
-      ];
+      ]);
     }
   }, [computePropertiesState]);
 

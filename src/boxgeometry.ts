@@ -16,8 +16,8 @@ import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
 
 */
 
-const BoxDimensions: Vec3 = [8, 5, 5];
-const color: Vec4 = [1, 1, 1, 1];
+const BoxDimensions: Vec3 = new Float32Array([8, 5, 5]);
+const color: Vec4 = new Float32Array([1, 1, 1, 1]);
 
 const halfx = BoxDimensions[0] / 2;
 const halfy = BoxDimensions[1] / 2;
@@ -59,4 +59,4 @@ geometry.setIndices(indicesArray);
 geometry.addAttribute({ shaderLocation: 0, offset: 0, format: 'float32x3' });
 geometry.addAttribute({ shaderLocation: 1, offset: 3 * Float32Array.BYTES_PER_ELEMENT, format: 'float32x4' });
 
-export { geometry as BoxGeometry, BoxDimensions };
+export { BoxDimensions, geometry as BoxGeometry };
