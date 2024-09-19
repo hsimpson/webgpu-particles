@@ -2,9 +2,9 @@
 /// <reference path="../node_modules/@webgpu/types/dist/index.d.ts" />
 
 import Camera from './camera';
-import WebGPURenderContext from './webgpurendercontext';
-import WebGPUMesh from './webgpumesh';
 import WebGPUComputePipline from './webgpucomputepipline';
+import WebGPUMesh from './webgpumesh';
+import WebGPURenderContext from './webgpurendercontext';
 
 interface WebGPURendererOptions {
   sampleCount?: number;

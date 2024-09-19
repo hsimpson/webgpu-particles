@@ -7,7 +7,9 @@
     "build": "vite build",
     "check-types": "tsc --noemit",
     "lint:ts": "eslint . --ext .ts --fix",
-    "lint": "yarn check-types && yarn lint:ts"
+    "lint": "yarn check-types && yarn lint:ts",
+    "format:check": "prettier . --check",
+    "format:fix": "prettier . --write"
   },
   "repository": {
     "type": "git",
