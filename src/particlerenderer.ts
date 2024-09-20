@@ -42,7 +42,7 @@ export default class ParticleRenderer {
   private readonly _movementSpeed = 0.25;
 
   private _computePipeLine: WebGPUComputePipline;
-  private _frameTimeCallback: FrameCallBackT;
+  private _frameTimeCallback?: FrameCallBackT;
 
   private _particleMaterial: WebGPUMaterial;
 
@@ -139,37 +139,34 @@ export default class ParticleRenderer {
     /**/
   }
 
-  public start(): void {
-    this._renderer.start().then(
-      () => {
-        const ro = new ResizeObserver((entries) => {
-          if (!Array.isArray(entries)) {
-            return;
-          }
+  public async start(): Promise<void> {
+    try {
+      await this._renderer.start();
+      const ro = new ResizeObserver((entries) => {
+        if (!Array.isArray(entries)) {
+          return;
+        }
 
-          const w = entries[0].contentRect.width * window.devicePixelRatio;
-          const h = entries[0].contentRect.height * window.devicePixelRatio;
-          this._canvas.width = w;
-          this._canvas.height = h;
+        const w = entries[0].contentRect.width * window.devicePixelRatio;
+        const h = entries[0].contentRect.height * window.devicePixelRatio;
+        this._canvas.width = w;
+        this._canvas.height = h;
 
-          this._camera.aspectRatio = w / h;
-          this._camera.updateMatrices();
-          this._renderer.resize();
-        });
-        ro.observe(this._canvas);
+        this._camera.aspectRatio = w / h;
+        this._camera.updateMatrices();
+        this._renderer.resize();
+      });
+      ro.observe(this._canvas);
 
-        this._canvas.addEventListener('wheel', this.onMouseWheel);
-        this._canvas.addEventListener('mousemove', this.onMouseMove);
-        document.addEventListener('keydown', this.onKeyDown);
-        document.addEventListener('keyup', this.onKeyup);
-        this._currentTime = performance.now();
-        this.render();
-      },
-      (error) => {
-        console.error(error);
-        // no WebGPU support
-      }
-    );
+      this._canvas.addEventListener('wheel', this.onMouseWheel);
+      this._canvas.addEventListener('mousemove', this.onMouseMove);
+      document.addEventListener('keydown', this.onKeyDown);
+      document.addEventListener('keyup', this.onKeyup);
+      this._currentTime = performance.now();
+      this.render();
+    } catch (error: unknown) {
+      console.error(error);
+    }
   }
 
   private render = (): void => {

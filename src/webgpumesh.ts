@@ -1,22 +1,22 @@
-import WebGPUEntity from './webgpuentity';
-import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
-import WebGPUGeometry from './webgpugeometry';
-import WebGPURenderContext from './webgpurendercontext';
-import { createBuffer } from './webgpuhelpers';
-import WebGPURenderPipeline from './webgpurenderpipeline';
-import WebGPUMaterial from './webgpumaterial';
 import Camera from './camera';
+import WebGPUEntity from './webgpuentity';
+import WebGPUGeometry from './webgpugeometry';
+import { createBuffer } from './webgpuhelpers';
+import WebGPUInterleavedGeometry from './webgpuinterleavedgeometry';
+import WebGPUMaterial from './webgpumaterial';
+import WebGPURenderContext from './webgpurendercontext';
+import WebGPURenderPipeline from './webgpurenderpipeline';
 
 export default class WebGPUMesh extends WebGPUEntity {
   private _geometry: WebGPUInterleavedGeometry | WebGPUGeometry;
   private _initialized = false;
-  private _uniformBuffer: GPUBuffer;
+  private _uniformBuffer: GPUBuffer | undefined;
 
   private _pipeline: WebGPURenderPipeline;
 
-  private _material: WebGPUMaterial;
+  private _material: WebGPUMaterial | undefined;
 
-  private _context: WebGPURenderContext;
+  private _context: WebGPURenderContext | undefined;
 
   public constructor(
     geometry: WebGPUInterleavedGeometry | WebGPUGeometry,
@@ -91,7 +91,7 @@ export default class WebGPUMesh extends WebGPUEntity {
   }
 
   private updateUniformBuffer(): void {
-    if (this._context) {
+    if (this._context && this._uniformBuffer) {
       const uboArray = new Float32Array([...this.modelMatrix]);
       this._context.queue.writeBuffer(this._uniformBuffer, 0, uboArray.buffer);
     }
@@ -118,7 +118,7 @@ export default class WebGPUMesh extends WebGPUEntity {
     return this._pipeline.gpuPipeline;
   }
 
-  public get material(): WebGPUMaterial {
+  public get material(): WebGPUMaterial | undefined {
     return this._material;
   }
 }

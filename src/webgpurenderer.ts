@@ -13,25 +13,25 @@ interface WebGPURendererOptions {
 export default class WebGPURenderer {
   private _canvas: HTMLCanvasElement;
 
-  private _context: WebGPURenderContext;
+  private _context?: WebGPURenderContext;
 
   private _meshes: WebGPUMesh[] = [];
 
-  private _presentationContext: GPUCanvasContext;
-  private _presentationSize: GPUExtent3DStrict;
-  private _presentationFormat: GPUTextureFormat;
+  private _presentationContext: GPUCanvasContext | null;
+  private _presentationSize?: GPUExtent3DStrict;
+  private _presentationFormat?: GPUTextureFormat;
 
-  private _renderTarget: GPUTexture;
-  private _renderTargetView: GPUTextureView;
+  private _renderTarget?: GPUTexture;
+  private _renderTargetView?: GPUTextureView;
 
-  private _depthTarget: GPUTexture;
-  private _depthTargetView: GPUTextureView;
+  private _depthTarget?: GPUTexture;
+  private _depthTargetView?: GPUTextureView;
 
   private _camera: Camera;
 
   private _options: WebGPURendererOptions;
 
-  private _computePipeLine: WebGPUComputePipline;
+  private _computePipeLine?: WebGPUComputePipline;
 
   public constructor(canvas: HTMLCanvasElement, camera: Camera, settings?: WebGPURendererOptions) {
     this._canvas = canvas;
@@ -44,6 +44,7 @@ export default class WebGPURenderer {
   }
 
   public static supportsWebGPU(): boolean {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (navigator.gpu) {
       return true;
     }
@@ -52,6 +53,7 @@ export default class WebGPURenderer {
 
   private async initialize(): Promise<void> {
     const gpu: GPU = navigator.gpu;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!gpu) {
       throw new Error('No WebGPU support navigator.gpu not available!');
     }

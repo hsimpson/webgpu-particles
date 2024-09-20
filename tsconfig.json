@@ -6,11 +6,12 @@
     "isolatedModules": true,
     "jsx": "react",
     "lib": ["DOM", "ES2022"],
-    "module": "commonjs",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "sourceMap": true,
     "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
     "target": "ES2022",
     "typeRoots": ["./src/@types", "./node_modules/@webgpu/types", "node_modules/@types"]
   }

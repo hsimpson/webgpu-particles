@@ -22,19 +22,19 @@ interface ComputeParams {
 
 export default class WebGPUComputePipline extends WebGPUPipelineBase {
   private _options: WebGPUComputePiplineOptions;
-  private _bindGroupLayout: GPUBindGroupLayout;
-  private _bindGroup: GPUBindGroup;
+  private _bindGroupLayout?: GPUBindGroupLayout;
+  private _bindGroup?: GPUBindGroup;
 
-  private _computeParamsUniformBuffer: GPUBuffer;
+  private _computeParamsUniformBuffer?: GPUBuffer;
   private _computeParamsUniformBufferSize = 0;
-  private _posBuffer: GPUBuffer;
-  private _velBuffer: GPUBuffer;
+  private _posBuffer?: GPUBuffer;
+  private _velBuffer?: GPUBuffer;
 
   private _computeParams: ComputeParams;
 
   private _drawMesh: WebGPUMesh;
 
-  private _context: WebGPURenderContext;
+  private _context?: WebGPURenderContext;
 
   public constructor(drawMesh: WebGPUMesh, options: WebGPUComputePiplineOptions) {
     super();
@@ -156,18 +156,30 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
   }
 
   private getParamsArray(): Float32Array {
-    const keys = Object.keys(this._computeParams);
-    const array = [];
-    for (let i = 0; i < keys.length; i++) {
-      const val = this._computeParams[keys[i]];
-      if (Array.isArray(val)) {
-        array.push(...val);
-      } else if (val instanceof Float32Array) {
-        array.push(...val);
+    const array: number[] = [];
+
+    Object.entries(this._computeParams).forEach(([_, value]) => {
+      if (Array.isArray(value)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        array.push(...value);
+      } else if (value instanceof Float32Array) {
+        array.push(...value);
       } else {
-        array.push(val);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        array.push(value);
       }
-    }
+    });
+
+    // for (let i = 0; i < keys.length; i++) {
+    //   const val = this._computeParams[keys[i]];
+    //   if (Array.isArray(val)) {
+    //     array.push(...val);
+    //   } else if (val instanceof Float32Array) {
+    //     array.push(...val);
+    //   } else {
+    //     array.push(val);
+    //   }
+    // }
     return new Float32Array(array);
   }
 
