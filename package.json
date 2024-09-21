@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "deploy": "yarn lint && yarn format:check && yarn build",
     "check-types": "tsc --noemit",
     "lint:ts": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -36,9 +37,6 @@
     "cross-env": "^7.0.3",
     "eslint": "^9.11.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-import-resolver-typescript": "^3.6.3",
-    "eslint-plugin-deprecation": "^3.0.0",
-    "eslint-plugin-import": "^2.30.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.36.1",
     "eslint-plugin-react-hooks": "^4.6.2",

@@ -60,7 +60,7 @@ export default tseslint.config(
     },
   },
 
-  // react
+  // plugin-react and plugin-react-hooks
   pluginReact.configs.flat.recommended,
   {
     plugins: {
@@ -79,7 +79,7 @@ export default tseslint.config(
     },
   },
 
-  // should come last
+  // prettier should come last
   configPrettier,
   pluginPrettierRecommended,
   {
