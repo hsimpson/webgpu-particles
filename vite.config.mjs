@@ -18,4 +18,5 @@ export default defineConfig({
   resolve: {
     alias: { '/src': path.resolve(process.cwd(), 'src') },
   },
+  base: '',
 });
