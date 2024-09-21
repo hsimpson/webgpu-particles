@@ -13,34 +13,38 @@ interface WebGPURendererOptions {
 export default class WebGPURenderer {
   private _canvas: HTMLCanvasElement;
 
-  private _context?: WebGPURenderContext;
+  private _context!: WebGPURenderContext;
 
   private _meshes: WebGPUMesh[] = [];
 
   private _presentationContext: GPUCanvasContext | null;
-  private _presentationSize?: GPUExtent3DStrict;
-  private _presentationFormat?: GPUTextureFormat;
+  private _presentationSize: GPUExtent3DDict;
+  private _presentationFormat!: GPUTextureFormat;
 
   private _renderTarget?: GPUTexture;
-  private _renderTargetView?: GPUTextureView;
+  private _renderTargetView!: GPUTextureView;
 
-  private _depthTarget?: GPUTexture;
-  private _depthTargetView?: GPUTextureView;
+  private _depthTarget!: GPUTexture;
+  private _depthTargetView!: GPUTextureView;
 
   private _camera: Camera;
 
-  private _options: WebGPURendererOptions;
+  private _options?: WebGPURendererOptions;
 
-  private _computePipeLine?: WebGPUComputePipline;
+  private _computePipeLine!: WebGPUComputePipline;
 
   public constructor(canvas: HTMLCanvasElement, camera: Camera, settings?: WebGPURendererOptions) {
     this._canvas = canvas;
     this._camera = camera;
-    const defaultOptions: WebGPURendererOptions = {
-      sampleCount: 1,
-    };
 
-    this._options = { ...defaultOptions, ...settings };
+    this._options = settings;
+    this._presentationContext = this._canvas.getContext('webgpu');
+
+    this._presentationSize = {
+      width: this._canvas.clientWidth * devicePixelRatio,
+      height: this._canvas.clientHeight * devicePixelRatio,
+      depthOrArrayLayers: 1,
+    };
   }
 
   public static supportsWebGPU(): boolean {
@@ -59,6 +63,10 @@ export default class WebGPURenderer {
     }
 
     const adapter = await gpu.requestAdapter();
+
+    if (!adapter) {
+      throw new Error('Could not request Adapter');
+    }
     console.log(adapter.limits);
 
     const device = await adapter.requestDevice();
@@ -74,10 +82,9 @@ export default class WebGPURenderer {
       depthOrArrayLayers: 1,
     };
 
-    this._presentationContext = this._canvas.getContext('webgpu');
     this._presentationFormat = gpu.getPreferredCanvasFormat();
 
-    this._presentationContext.configure({
+    this._presentationContext?.configure({
       device: this._context.device,
       format: this._presentationFormat,
       alphaMode: 'opaque',
@@ -90,16 +97,10 @@ export default class WebGPURenderer {
       this._depthTarget.destroy();
     }
 
-    this._presentationSize = {
-      width: this._canvas.clientWidth * devicePixelRatio,
-      height: this._canvas.clientHeight * devicePixelRatio,
-      depthOrArrayLayers: 1,
-    };
-
     /* render target */
     this._renderTarget = this._context.device.createTexture({
       size: this._presentationSize,
-      sampleCount: this._options.sampleCount,
+      sampleCount: this._options?.sampleCount ?? 1,
       format: this._presentationFormat,
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
@@ -108,7 +109,7 @@ export default class WebGPURenderer {
     /* depth target */
     this._depthTarget = this._context.device.createTexture({
       size: this._presentationSize,
-      sampleCount: this._options.sampleCount,
+      sampleCount: this._options?.sampleCount ?? 1,
       format: 'depth24plus-stencil8',
       usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
@@ -125,9 +126,7 @@ export default class WebGPURenderer {
 
     await Promise.all(meshInitializers);
 
-    if (this._computePipeLine) {
-      await this._computePipeLine.initialize(this._context);
-    }
+    await this._computePipeLine.initialize(this._context);
   }
 
   private computePass(deltaTime: number): void {
@@ -145,13 +144,17 @@ export default class WebGPURenderer {
   }
 
   private renderPass(): void {
+    if (!this._presentationContext) {
+      throw new Error('No resentationContext given');
+    }
     const colorAttachment: GPURenderPassColorAttachment = {
       view: this._presentationContext.getCurrentTexture().createView(),
       loadOp: 'clear',
       storeOp: 'store',
     };
 
-    if (this._options.sampleCount > 1) {
+    const sampleCount = this._options?.sampleCount ?? 1;
+    if (sampleCount > 1) {
       colorAttachment.view = this._renderTargetView;
       colorAttachment.resolveTarget = this._presentationContext.getCurrentTexture().createView();
     }
@@ -202,8 +205,8 @@ export default class WebGPURenderer {
     const devicePixelRatio = window.devicePixelRatio || 1;
 
     if (
-      this._canvas.clientWidth * devicePixelRatio !== this._presentationSize[0] ||
-      this._canvas.clientHeight * devicePixelRatio !== this._presentationSize[1]
+      this._canvas.clientWidth * devicePixelRatio !== this._presentationSize.width ||
+      this._canvas.clientHeight * devicePixelRatio !== this._presentationSize.height
     ) {
       this.reCreateSwapChain();
     }

@@ -11,7 +11,7 @@ interface FrameStats {
 }
 
 const Renderer = (): React.ReactElement => {
-  const canvasEl = useRef<HTMLCanvasElement>();
+  const canvasEl = useRef<HTMLCanvasElement>(null);
   const [frameStats, setFrameStats] = useState<FrameStats>({
     frameTime: 0,
     cpuTime: 0,
@@ -19,7 +19,7 @@ const Renderer = (): React.ReactElement => {
   const [computePropertiesState] = useRecoilState(ComputePropertiesAtom);
   const [particleCountState] = useRecoilState(ParticleCountAtom);
 
-  const particlerenderer = useRef<Particlerenderer>();
+  const particlerenderer = useRef<Particlerenderer | null>(null);
   const particleChangeTimer = useRef<number>();
 
   const onFrameTimeChanged = (frameTime: number, cpuTime: number): void => {
@@ -37,10 +37,10 @@ const Renderer = (): React.ReactElement => {
       particleChangeTimer.current = window.setTimeout(() => {
         void (async () => {
           console.log(`update particle count: ${particleCountState}`);
-          await particlerenderer.current.computePipline.updateParticleCount(particleCountState);
+          await particlerenderer.current?.computePipline.updateParticleCount(particleCountState);
         })();
       }, 1000);
-    } else {
+    } else if (canvasEl.current) {
       particlerenderer.current = new Particlerenderer(canvasEl.current, particleCountState, onFrameTimeChanged);
       void particlerenderer.current.start();
     }

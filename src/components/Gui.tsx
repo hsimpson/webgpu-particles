@@ -1,8 +1,8 @@
 import React from 'react';
-import Slider from './Slider';
 import { ChromePicker, ColorResult } from 'react-color';
-import { ComputePropertiesAtom, ParticleCountAtom } from './state';
 import { useRecoilState, useResetRecoilState } from 'recoil';
+import Slider from './Slider';
+import { ComputePropertiesAtom, ParticleCountAtom } from './state';
 
 const Gui = (): React.ReactElement => {
   const [computePropertiesState, setComputePropertiesState] = useRecoilState(ComputePropertiesAtom);
@@ -58,7 +58,12 @@ const Gui = (): React.ReactElement => {
         }}
         labelText={`Force: ${computePropertiesState.force.toFixed(2)}`}
       />
-      <ChromePicker color={computePropertiesState.color} onChange={onColorChange} />
+      {
+        // TODO: fix this when <ChromePicker /> is fixed
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        <ChromePicker color={computePropertiesState.color} onChange={onColorChange} />
+      }
       <button className="my-2 rounded bg-red-500 hover:bg-red-700 py-1 px-4 text-white" onClick={onReset}>
         Reset to default values
       </button>

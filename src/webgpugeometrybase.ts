@@ -1,10 +1,10 @@
+import { createBuffer } from './webgpuhelpers';
 import WebGPUObjectBase from './webgpuobjectbase';
 import WebGPURenderContext from './webgpurendercontext';
-import { createBuffer } from './webgpuhelpers';
 
 export default abstract class WebGPUGeometryBase extends WebGPUObjectBase {
-  private _indicesArray: Uint16Array;
-  private _indexBuffer: GPUBuffer;
+  private _indicesArray!: Uint16Array;
+  private _indexBuffer!: GPUBuffer;
   protected _vertexBuffers: GPUBuffer[] = [];
   protected _initialized = false;
   protected _vertexBufferLayouts: GPUVertexBufferLayout[] = [];

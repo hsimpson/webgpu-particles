@@ -1,19 +1,19 @@
-import WebGPURenderContext from './webgpurendercontext';
 import WebGPUPipelineBase from './webgpupipelinebase';
+import WebGPURenderContext from './webgpurendercontext';
 
 interface WebGPURenderPipelineOptions {
   primitiveTopology?: GPUPrimitiveTopology;
   sampleCount?: number;
   colorFormat?: GPUTextureFormat;
   depthFormat?: GPUTextureFormat;
-  vertexShaderUrl?: string;
-  fragmentShaderUrl?: string;
+  vertexShaderUrl: string;
+  fragmentShaderUrl: string;
   useWGSL?: boolean;
 }
 
 export default class WebGPURenderPipeline extends WebGPUPipelineBase {
   private _options: WebGPURenderPipelineOptions;
-  private _bindGroup: GPUBindGroup;
+  private _bindGroup!: GPUBindGroup;
 
   public constructor(options: WebGPURenderPipelineOptions) {
     super();
@@ -22,6 +22,8 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
       sampleCount: 1,
       colorFormat: 'bgra8unorm',
       depthFormat: 'depth24plus-stencil8',
+      vertexShaderUrl: '',
+      fragmentShaderUrl: '',
     };
     this._options = { ...defaultOptions, ...options };
   }
@@ -37,7 +39,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     }
     this._initialized = true;
 
-    let stripIndexFormat = undefined;
+    let stripIndexFormat: GPUIndexFormat = 'uint16';
     if (this._options.primitiveTopology === 'triangle-strip' || this._options.primitiveTopology === 'line-strip') {
       stripIndexFormat = 'uint16';
     }
@@ -56,7 +58,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     };
 
     const colorState: GPUColorTargetState = {
-      format: this._options.colorFormat,
+      format: this._options.colorFormat ?? 'bgra8unorm',
       blend: {
         color: {
           srcFactor: 'src-alpha',
@@ -75,7 +77,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     const depthStencilState: GPUDepthStencilState = {
       depthWriteEnabled: true,
       depthCompare: 'less',
-      format: this._options.depthFormat,
+      format: this._options.depthFormat ?? 'depth24plus-stencil8',
     };
 
     const fragmentState: GPUFragmentState = {

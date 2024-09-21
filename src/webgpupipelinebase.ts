@@ -3,7 +3,7 @@ import WebGPURenderContext from './webgpurendercontext';
 
 export default abstract class WebGPUPipelineBase extends WebGPUObjectBase {
   protected _initialized = false;
-  protected _pipeline: GPURenderPipeline | GPUComputePipeline;
+  protected _pipeline!: GPURenderPipeline | GPUComputePipeline;
 
   public constructor() {
     super();

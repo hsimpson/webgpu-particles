@@ -22,19 +22,19 @@ interface ComputeParams {
 
 export default class WebGPUComputePipline extends WebGPUPipelineBase {
   private _options: WebGPUComputePiplineOptions;
-  private _bindGroupLayout?: GPUBindGroupLayout;
-  private _bindGroup?: GPUBindGroup;
+  private _bindGroupLayout!: GPUBindGroupLayout;
+  private _bindGroup!: GPUBindGroup;
 
-  private _computeParamsUniformBuffer?: GPUBuffer;
+  private _computeParamsUniformBuffer!: GPUBuffer;
   private _computeParamsUniformBufferSize = 0;
-  private _posBuffer?: GPUBuffer;
-  private _velBuffer?: GPUBuffer;
+  private _posBuffer!: GPUBuffer;
+  private _velBuffer!: GPUBuffer;
 
   private _computeParams: ComputeParams;
 
   private _drawMesh: WebGPUMesh;
 
-  private _context?: WebGPURenderContext;
+  private _context!: WebGPURenderContext;
 
   public constructor(drawMesh: WebGPUMesh, options: WebGPUComputePiplineOptions) {
     super();

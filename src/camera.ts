@@ -7,13 +7,13 @@ export default class Camera {
   private _viewMatrix = mat4.identity();
   private _rotation = quat.identity();
 
-  private _uniformBuffer: GPUBuffer;
+  private _uniformBuffer!: GPUBuffer;
   /*
   private _uniformBindGroupLayout: GPUBindGroupLayout;
   private _uniformBindGroup: GPUBindGroup;
   */
   private _initialized = false;
-  private _context: WebGPURenderContext;
+  private _context!: WebGPURenderContext;
 
   public position: Vec3 = vec3.create(0, 0, 0);
   public target: Vec3 = vec3.create(0, 0, 0);
@@ -74,10 +74,8 @@ export default class Camera {
   }
 
   private updateUniformBuffer(): void {
-    if (this._initialized) {
-      const uboArray = new Float32Array([...this._viewMatrix, ...this._perspectiveMatrix]);
-      this._context.queue.writeBuffer(this._uniformBuffer, 0, uboArray.buffer);
-    }
+    const uboArray = new Float32Array([...this._viewMatrix, ...this._perspectiveMatrix]);
+    this._context.queue.writeBuffer(this._uniformBuffer, 0, uboArray.buffer);
   }
 
   public rotateQuat(rotation: Quat): void {

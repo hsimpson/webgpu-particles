@@ -3,14 +3,14 @@ import { createBuffer } from './webgpuhelpers';
 import WebGPURenderContext from './webgpurendercontext';
 
 export default class WebGPUMaterial {
-  private _uniformBuffer: GPUBuffer;
+  private _uniformBuffer!: GPUBuffer;
   private _bindGroupLayoutEntries: GPUBindGroupLayoutEntry[] = [];
   private _bindGroupEntries: GPUBindGroupEntry[] = [];
 
   private _initialized = false;
   private _color: Vec4;
 
-  private _context: WebGPURenderContext;
+  private _context!: WebGPURenderContext;
 
   public constructor(color: Vec4) {
     this._color = color;

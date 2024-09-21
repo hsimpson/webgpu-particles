@@ -1,11 +1,15 @@
+import WebGPUGeometryBase from './webgpugeometrybase';
 import { createBuffer } from './webgpuhelpers';
 import WebGPURenderContext from './webgpurendercontext';
-import WebGPUGeometryBase from './webgpugeometrybase';
 
 export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
-  private _interleavedArray: Float32Array;
-  private _stride: number;
+  private _interleavedArray!: Float32Array;
+  private _stride: number = 0;
   private _attributes: GPUVertexAttribute[] = [];
+
+  public constructor() {
+    super();
+  }
 
   public setVertices(array: Float32Array, stride: number): void {
     this._interleavedArray = array;
