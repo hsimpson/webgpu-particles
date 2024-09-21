@@ -39,7 +39,8 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     }
     this._initialized = true;
 
-    let stripIndexFormat: GPUIndexFormat = 'uint16';
+    // default undefined, only strip topologies (triangle-strip, line-strip) are allowed to set this
+    let stripIndexFormat: GPUIndexFormat | undefined = undefined;
     if (this._options.primitiveTopology === 'triangle-strip' || this._options.primitiveTopology === 'line-strip') {
       stripIndexFormat = 'uint16';
     }

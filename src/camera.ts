@@ -28,7 +28,6 @@ export default class Camera {
     this.aspectRatio = aspectRatio;
     this.zNear = zNear;
     this.zFar = zFar;
-    this.updateMatrices();
   }
 
   public initalize(context: WebGPURenderContext): void {
@@ -41,6 +40,7 @@ export default class Camera {
 
     const uboArray = new Float32Array([...this._viewMatrix, ...this._perspectiveMatrix]);
     this._uniformBuffer = createBuffer(context.device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
+    this.updateMatrices();
   }
 
   public get viewMatrix() {

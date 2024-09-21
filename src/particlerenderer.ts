@@ -55,7 +55,6 @@ export default class ParticleRenderer {
     this._camera = new Camera(45, this._canvas.width / this._canvas.height, 0.1, 1000);
     this._camera.position = new Float32Array([0, 0, 15]);
     //this._camera.position = [10, 5, 15];
-    this._camera.updateMatrices();
 
     this._renderer = new WebGPURenderer(this._canvas, this._camera, { sampleCount: this._sampleCount });
 
