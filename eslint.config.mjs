@@ -11,7 +11,7 @@ export default tseslint.config(
   eslintConfigPrettier,
 
   {
-    ignores: ['eslint.config.mjs', 'build/**/*', 'postcss.config.js', 'tailwind.config.js'],
+    ignores: ['eslint.config.mjs', 'build/**/*', 'postcss.config.js', 'tailwind.config.js', 'vite.config.mjs'],
   },
   {
     languageOptions: {
