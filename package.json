@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --emptyOutDir",
     "deploy": "yarn lint && yarn format:check && yarn build",
     "check-types": "tsc --noemit",
     "lint:ts": "eslint .",
