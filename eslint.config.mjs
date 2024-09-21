@@ -1,6 +1,7 @@
 import eslint from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import reactPlugin from 'eslint-plugin-react';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -13,12 +14,28 @@ export default tseslint.config(
   },
   {
     languageOptions: {
+      ...reactPlugin.configs.flat.recommended.languageOptions,
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
   },
+
+  // eslint-rules
+  {
+    rules: {
+      'linebreak-style': ['error', 'unix'],
+      'no-unused-vars': 'off',
+      'no-warning-comments': 'warn',
+      eqeqeq: 'error',
+      indent: ['error', 2, { SwitchCase: 1 }],
+      quotes: ['error', 'single'],
+      semi: ['error', 'always'],
+    },
+  },
+
+  // typescript-eslint rules
   {
     rules: {
       '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'explicit' }],
@@ -39,16 +56,30 @@ export default tseslint.config(
       '@typescript-eslint/promise-function-async': 'error',
       '@typescript-eslint/require-await': 'error',
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+    },
+  },
 
-      eqeqeq: 'error',
-      'no-warning-comments': 'warn',
+  // react
+  reactPlugin.configs.flat.recommended,
+  {
+    plugins: {
+      react: reactPlugin,
+    },
+    rules: {
+      'react/self-closing-comp': ['error', { component: true, html: true }],
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+  },
 
   // should come last
   eslintConfigPrettier,
   eslintPluginPrettierRecommended,
   {
     rules: {
-      indent: ['error', 2, { SwitchCase: 1 }],
       'prettier/prettier': 'error',
     },
   },
