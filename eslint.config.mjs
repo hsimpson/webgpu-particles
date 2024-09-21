@@ -1,7 +1,8 @@
 import eslint from '@eslint/js';
-import eslintConfigPrettier from 'eslint-config-prettier';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import reactPlugin from 'eslint-plugin-react';
+import configPrettier from 'eslint-config-prettier';
+import pluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import pluginReact from 'eslint-plugin-react';
+import reactPlugin from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -14,7 +15,7 @@ export default tseslint.config(
   },
   {
     languageOptions: {
-      ...reactPlugin.configs.flat.recommended.languageOptions,
+      ...pluginReact.configs.flat.recommended.languageOptions,
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
@@ -60,13 +61,16 @@ export default tseslint.config(
   },
 
   // react
-  reactPlugin.configs.flat.recommended,
+  pluginReact.configs.flat.recommended,
   {
     plugins: {
-      react: reactPlugin,
+      react: pluginReact,
+      'react-hooks': reactPlugin,
     },
     rules: {
       'react/self-closing-comp': ['error', { component: true, html: true }],
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
     },
     settings: {
       react: {
@@ -76,8 +80,8 @@ export default tseslint.config(
   },
 
   // should come last
-  eslintConfigPrettier,
-  eslintPluginPrettierRecommended,
+  configPrettier,
+  pluginPrettierRecommended,
   {
     rules: {
       'prettier/prettier': 'error',
