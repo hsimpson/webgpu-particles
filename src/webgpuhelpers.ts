@@ -4,7 +4,7 @@ import { vec3 } from 'wgpu-matrix';
 export function createBuffer(
   device: GPUDevice,
   arr: Float32Array | Uint16Array,
-  usage: GPUBufferUsageFlags
+  usage: GPUBufferUsageFlags,
 ): GPUBuffer {
   const buffer = device.createBuffer({
     mappedAtCreation: true,
@@ -26,7 +26,7 @@ export function createRandomParticles(count: number, elements: number): Float32A
     return vec3.create(
       Math.random() * BoxDimensions[0] - BoxDimensions[0] / 2,
       Math.random() * BoxDimensions[1] - BoxDimensions[1] / 2,
-      Math.random() * BoxDimensions[2] - BoxDimensions[2] / 2
+      Math.random() * BoxDimensions[2] - BoxDimensions[2] / 2,
     );
   };
 

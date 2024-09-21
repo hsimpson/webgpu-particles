@@ -72,7 +72,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
     this._computeParamsUniformBuffer = createBuffer(
       context.device,
       uniformArray,
-      GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+      GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     );
 
     this._velBuffer = createBuffer(context.device, velArray, GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE);

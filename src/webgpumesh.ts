@@ -21,7 +21,7 @@ export default class WebGPUMesh extends WebGPUEntity {
   public constructor(
     geometry: WebGPUInterleavedGeometry | WebGPUGeometry,
     pipeline: WebGPURenderPipeline,
-    material?: WebGPUMaterial
+    material?: WebGPUMaterial,
   ) {
     super();
     this._geometry = geometry;
@@ -86,7 +86,7 @@ export default class WebGPUMesh extends WebGPUEntity {
       context,
       this._geometry.vertexBufferLayouts,
       bindGroupLayoutEntries,
-      bindGroupEntries
+      bindGroupEntries,
     );
   }
 

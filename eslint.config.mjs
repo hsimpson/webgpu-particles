@@ -1,14 +1,12 @@
 import eslint from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   // ...tseslint.config.stylistic,
-
-  // should come last
-  eslintConfigPrettier,
 
   {
     ignores: ['eslint.config.mjs', 'build/**/*', 'postcss.config.js', 'tailwind.config.js', 'vite.config.mjs'],
@@ -44,6 +42,14 @@ export default tseslint.config(
 
       eqeqeq: 'error',
       'no-warning-comments': 'warn',
+
+  // should come last
+  eslintConfigPrettier,
+  eslintPluginPrettierRecommended,
+  {
+    rules: {
+      indent: ['error', 2, { SwitchCase: 1 }],
+      'prettier/prettier': 'error',
     },
-  }
+  },
 );

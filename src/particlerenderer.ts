@@ -98,7 +98,7 @@ export default class ParticleRenderer {
     this._particleMesh = new WebGPUMesh(
       new ParticleGeometry(particleCount, 4),
       particlePipeline,
-      this._particleMaterial
+      this._particleMaterial,
     );
     this._particleMesh.name = 'ParticleMesh';
 

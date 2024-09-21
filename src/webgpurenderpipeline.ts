@@ -32,7 +32,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     context: WebGPURenderContext,
     vertexBufferLayouts: GPUVertexBufferLayout[],
     bindGroupLayoutEntries: GPUBindGroupLayoutEntry[],
-    bindGroupEntries: GPUBindGroupEntry[]
+    bindGroupEntries: GPUBindGroupEntry[],
   ): Promise<void> {
     if (this._initialized) {
       return;

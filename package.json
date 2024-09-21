@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "check-types": "tsc --noemit",
-    "lint:ts": "eslint . --fix",
+    "lint:ts": "eslint .",
+    "lint:fix": "eslint . --fix",
     "lint": "yarn check-types && yarn lint:ts",
     "format:check": "prettier . --check",
     "format:fix": "prettier . --write"
