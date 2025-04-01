@@ -11,7 +11,7 @@ export default tseslint.config(
   // ...tseslint.config.stylistic,
 
   {
-    ignores: ['eslint.config.mjs', 'dist/**/*', 'postcss.config.js', 'tailwind.config.js', 'vite.config.mjs'],
+    ignores: ['dist/**/*', 'eslint.config.mjs', 'prettier.config.js', 'tailwind.config.js', 'vite.config.mjs'],
   },
   {
     languageOptions: {

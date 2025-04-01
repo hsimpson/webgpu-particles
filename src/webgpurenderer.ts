@@ -164,8 +164,6 @@ export default class WebGPURenderer {
       depthStencilAttachment: {
         view: this._depthTargetView,
 
-        // TODO: check https://github.com/gund/eslint-plugin-deprecation/issues/13
-        // depthLoadValue: 1.0,
         depthLoadOp: 'clear',
         depthClearValue: 1.0,
         depthStoreOp: 'store',

@@ -1,14 +1,15 @@
+import { useAtom } from 'jotai';
+import { useResetAtom } from 'jotai/utils';
 import React from 'react';
 import { ChromePicker, ColorResult } from 'react-color';
-import { useRecoilState, useResetRecoilState } from 'recoil';
 import Slider from './Slider';
-import { ComputePropertiesAtom, ParticleCountAtom } from './state';
+import { computeProperties, particleCounter } from './state';
 
 const Gui = (): React.ReactElement => {
-  const [computePropertiesState, setComputePropertiesState] = useRecoilState(ComputePropertiesAtom);
-  const [particleCountState, setParticleCountState] = useRecoilState(ParticleCountAtom);
-  const resetComputeProperties = useResetRecoilState(ComputePropertiesAtom);
-  const resetParticleCount = useResetRecoilState(ParticleCountAtom);
+  const [computePropertiesState, setComputePropertiesState] = useAtom(computeProperties);
+  const [particleCountState, setParticleCountState] = useAtom(particleCounter);
+  const resetComputeProperties = useResetAtom(computeProperties);
+  const resetParticleCount = useResetAtom(particleCounter);
 
   const onColorChange = (colorResult: ColorResult): void => {
     const color = {
@@ -27,7 +28,7 @@ const Gui = (): React.ReactElement => {
   };
 
   return (
-    <div className="absolute left-0 top-28 w-72 p-2 bg-white bg-opacity-10 flex flex-col gap-1 text-gray-200">
+    <div className="absolute left-0 top-28 w-72 p-2 bg-white/10 flex flex-col gap-1 text-gray-200">
       <Slider
         min={1}
         max={8_100_000}
@@ -58,12 +59,7 @@ const Gui = (): React.ReactElement => {
         }}
         labelText={`Force: ${computePropertiesState.force.toFixed(2)}`}
       />
-      {
-        // TODO: fix this when <ChromePicker /> is fixed
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        <ChromePicker color={computePropertiesState.color} onChange={onColorChange} />
-      }
+      <ChromePicker color={computePropertiesState.color} onChange={onColorChange} />
       <button className="my-2 rounded bg-red-500 hover:bg-red-700 py-1 px-4 text-white" onClick={onReset}>
         Reset to default values
       </button>

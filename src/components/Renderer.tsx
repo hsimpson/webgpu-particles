@@ -1,8 +1,8 @@
+import { useAtom } from 'jotai';
 import React, { useEffect, useRef, useState } from 'react';
-import { useRecoilState } from 'recoil';
 import Particlerenderer from '../particlerenderer';
 import Gui from './Gui';
-import { ComputePropertiesAtom, ParticleCountAtom } from './state';
+import { computeProperties, particleCounter } from './state';
 import Stats from './Stats';
 
 interface FrameStats {
@@ -12,21 +12,15 @@ interface FrameStats {
 
 const Renderer = (): React.ReactElement => {
   const canvasEl = useRef<HTMLCanvasElement>(null);
-  const [frameStats, setFrameStats] = useState<FrameStats>({
-    frameTime: 0,
-    cpuTime: 0,
-  });
-  const [computePropertiesState] = useRecoilState(ComputePropertiesAtom);
-  const [particleCountState] = useRecoilState(ParticleCountAtom);
+  const [frameStats, setFrameStats] = useState<FrameStats>({ frameTime: 0, cpuTime: 0 });
+  const [computePropertiesState] = useAtom(computeProperties);
+  const [particleCount] = useAtom(particleCounter);
 
   const particlerenderer = useRef<Particlerenderer | null>(null);
-  const particleChangeTimer = useRef<number>();
+  const particleChangeTimer = useRef<number>(0);
 
   const onFrameTimeChanged = (frameTime: number, cpuTime: number): void => {
-    setFrameStats({
-      frameTime,
-      cpuTime,
-    });
+    setFrameStats({ frameTime, cpuTime });
   };
 
   useEffect(() => {
@@ -36,15 +30,15 @@ const Renderer = (): React.ReactElement => {
       }
       particleChangeTimer.current = window.setTimeout(() => {
         void (async () => {
-          console.log(`update particle count: ${particleCountState}`);
-          await particlerenderer.current?.computePipline.updateParticleCount(particleCountState);
+          console.log(`update particle count: ${particleCount}`);
+          await particlerenderer.current?.computePipline.updateParticleCount(particleCount);
         })();
       }, 1000);
     } else if (canvasEl.current) {
-      particlerenderer.current = new Particlerenderer(canvasEl.current, particleCountState, onFrameTimeChanged);
+      particlerenderer.current = new Particlerenderer(canvasEl.current, particleCount, onFrameTimeChanged);
       void particlerenderer.current.start();
     }
-  }, [particleCountState]);
+  }, [particleCount]);
 
   useEffect(() => {
     if (particlerenderer.current) {

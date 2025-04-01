@@ -1,11 +1,10 @@
 import React from 'react';
-import Renderer from './Renderer';
-import { RecoilRoot } from 'recoil';
 import WebGPURenderer from '../webgpurenderer';
 import ErrorMessage from './ErrorMessage';
+import Renderer from './Renderer';
 
 const App = (): React.ReactElement => {
-  return <RecoilRoot>{WebGPURenderer.supportsWebGPU() ? <Renderer /> : <ErrorMessage />}</RecoilRoot>;
+  return WebGPURenderer.supportsWebGPU() ? <Renderer /> : <ErrorMessage />;
 };
 
 export default App;
