@@ -55,7 +55,7 @@ const Renderer = (): React.ReactElement => {
 
   return (
     <React.Fragment>
-      <canvas className="w-full h-full" ref={canvasEl} tabIndex={1} />
+      <canvas className="h-full w-full" ref={canvasEl} tabIndex={1} />
       <Stats frameTime={frameStats.frameTime} cpuTime={frameStats.cpuTime} />
       <Gui />
     </React.Fragment>

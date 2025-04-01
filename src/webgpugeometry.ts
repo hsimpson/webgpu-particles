@@ -1,6 +1,6 @@
+import WebGPUGeometryBase from './webgpugeometrybase';
 import { createBuffer } from './webgpuhelpers';
 import WebGPURenderContext from './webgpurendercontext';
-import WebGPUGeometryBase from './webgpugeometrybase';
 
 interface GeometryAttribute {
   array: Float32Array;
@@ -30,7 +30,7 @@ export default class WebGPUGeometry extends WebGPUGeometryBase {
 
     for (let i = 0; i < this._attributes.length; i++) {
       const attribute = this._attributes[i];
-      const buffer = createBuffer(context.device, attribute.array, attribute.usage || GPUBufferUsage.VERTEX);
+      const buffer = createBuffer(context.device, attribute.array, attribute.usage ?? GPUBufferUsage.VERTEX);
       buffer.label = `Buffer-${this.name}-Attribute-${i}`;
       this._vertexBuffers.push(buffer);
 

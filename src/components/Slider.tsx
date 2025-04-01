@@ -16,7 +16,7 @@ const Slider = (props: SliderProps): React.ReactElement => {
   return (
     <div className="slider">
       <label>
-        {props.labelText || ''}
+        {props.labelText ?? ''}
         <br />
         <input
           className="w-full"

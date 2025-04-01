@@ -4,7 +4,7 @@ import WebGPURenderContext from './webgpurendercontext';
 
 export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
   private _interleavedArray!: Float32Array;
-  private _stride: number = 0;
+  private _stride = 0;
   private _attributes: GPUVertexAttribute[] = [];
 
   public constructor() {

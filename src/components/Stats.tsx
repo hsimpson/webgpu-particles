@@ -7,7 +7,7 @@ export interface StatsProps {
 
 const Stats = (props: StatsProps): React.ReactElement => {
   return (
-    <div className="absolute left-0 top-0 p-2 text-red-400">
+    <div className="absolute top-0 left-0 p-2 text-red-400">
       {`Avg frame time: ${props.frameTime.toFixed(3)} ms`}
       <br />
       {`FPS: ${(1000 / props.frameTime).toFixed(2)}`}

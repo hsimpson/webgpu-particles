@@ -3,6 +3,6 @@
 /* Custom css */
 @layer base {
   a {
-    @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600;
+    @apply text-blue-600 underline visited:text-purple-600 hover:text-blue-800;
   }
 }
