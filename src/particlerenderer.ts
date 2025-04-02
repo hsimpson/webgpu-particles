@@ -146,14 +146,14 @@ export default class ParticleRenderer {
           return;
         }
 
-        const w = entries[0].contentRect.width * window.devicePixelRatio;
-        const h = entries[0].contentRect.height * window.devicePixelRatio;
-        this._canvas.width = w;
-        this._canvas.height = h;
+        const width = entries[0].contentRect.width * window.devicePixelRatio;
+        const height = entries[0].contentRect.height * window.devicePixelRatio;
+        this._canvas.width = width;
+        this._canvas.height = height;
 
-        this._camera.aspectRatio = w / h;
+        this._camera.aspectRatio = width / height;
         this._camera.updateMatrices();
-        this._renderer.resize();
+        this._renderer.resize(width, height);
       });
       ro.observe(this._canvas);
 

@@ -69,18 +69,15 @@ export default class WebGPURenderer {
     }
     console.log(adapter.limits);
 
-    const device = await adapter.requestDevice();
+    const device = await adapter.requestDevice({
+      requiredLimits: {
+        maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+      },
+    });
 
     const queue = device.queue;
 
     this._context = new WebGPURenderContext(this._canvas, device, queue);
-
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    this._presentationSize = {
-      width: this._canvas.clientWidth * devicePixelRatio,
-      height: this._canvas.clientHeight * devicePixelRatio,
-      depthOrArrayLayers: 1,
-    };
 
     this._presentationFormat = gpu.getPreferredCanvasFormat();
 
@@ -199,13 +196,13 @@ export default class WebGPURenderer {
     this._context.queue.submit([commandEncoder.finish()]);
   }
 
-  public resize(): void {
-    const devicePixelRatio = window.devicePixelRatio || 1;
-
-    if (
-      this._canvas.clientWidth * devicePixelRatio !== this._presentationSize.width ||
-      this._canvas.clientHeight * devicePixelRatio !== this._presentationSize.height
-    ) {
+  public resize(width: number, height: number): void {
+    if (width !== this._presentationSize.width || height !== this._presentationSize.height) {
+      this._presentationSize = {
+        width,
+        height,
+        depthOrArrayLayers: 1,
+      };
       this.reCreateSwapChain();
     }
   }

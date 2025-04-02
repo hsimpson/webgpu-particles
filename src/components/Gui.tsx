@@ -30,9 +30,9 @@ const Gui = (): React.ReactElement => {
   return (
     <div className="absolute top-28 left-0 flex w-72 flex-col gap-1 bg-white/10 p-2 text-gray-200">
       <Slider
-        min={1}
-        max={8_100_000}
-        step={100_000}
+        min={1_000}
+        max={10_000_000}
+        step={1_000}
         value={particleCountState}
         onValueChange={(particleCount: number) => {
           setParticleCountState(particleCount);

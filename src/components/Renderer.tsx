@@ -54,11 +54,11 @@ const Renderer = (): React.ReactElement => {
   }, [computePropertiesState]);
 
   return (
-    <React.Fragment>
+    <>
       <canvas className="h-full w-full" ref={canvasEl} tabIndex={1} />
       <Stats frameTime={frameStats.frameTime} cpuTime={frameStats.cpuTime} />
       <Gui />
-    </React.Fragment>
+    </>
   );
 };
 
