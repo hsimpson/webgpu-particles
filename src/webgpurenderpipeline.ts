@@ -20,7 +20,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     const defaultOptions: WebGPURenderPipelineOptions = {
       primitiveTopology: 'triangle-list',
       sampleCount: 1,
-      colorFormat: 'bgra8unorm',
+      colorFormat: 'rgba8unorm',
       depthFormat: 'depth24plus-stencil8',
       vertexShaderUrl: '',
       fragmentShaderUrl: '',
