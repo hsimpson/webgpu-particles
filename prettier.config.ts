@@ -1,4 +1,6 @@
-module.exports = {
+import { type Config } from 'prettier';
+
+const config: Config = {
   arrowParens: 'always',
   bracketSameLine: true,
   bracketSpacing: true,
@@ -18,5 +20,6 @@ module.exports = {
 
   plugins: ['prettier-plugin-tailwindcss'],
   tailwindStylesheet: './src/index.css',
-  tailwindConfig: './tailwind.config.js',
 };
+
+export default config;
