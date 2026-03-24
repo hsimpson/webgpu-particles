@@ -14,7 +14,7 @@ export default defineConfig(
   reactHooks.configs.flat.recommended,
 
   {
-    ignores: ['dist/**/*', 'tailwind.config.js'],
+    ignores: ['dist/**/*'],
   },
 
   // configuration for rules that require type information
