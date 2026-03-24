@@ -1,7 +1,7 @@
+import eslintReact from '@eslint-react/eslint-plugin';
 import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
 import pluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
@@ -10,6 +10,8 @@ export default defineConfig(
   eslint.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
+  eslintReact.configs['strict-type-checked'],
+  reactHooks.configs.flat.recommended,
 
   {
     ignores: ['dist/**/*', 'tailwind.config.js'],
@@ -18,14 +20,13 @@ export default defineConfig(
   // configuration for rules that require type information
   {
     languageOptions: {
-      ...reactPlugin.configs.flat.recommended.languageOptions,
       parserOptions: {
         projectService: true,
       },
     },
   },
 
-  // eslint-rules
+  // customize eslint-rules
   {
     rules: {
       'no-unused-vars': 'off', // Note: you must disable the base rule as it can report incorrect errors
@@ -34,7 +35,7 @@ export default defineConfig(
     },
   },
 
-  // typescript-eslint rules
+  // customize typescript-eslint rules
   {
     rules: {
       '@typescript-eslint/consistent-type-definitions': 'off',
@@ -56,20 +57,11 @@ export default defineConfig(
     },
   },
 
-  // plugin-react and plugin-react-hooks
-  reactPlugin.configs.flat.recommended,
-  reactPlugin.configs.flat['jsx-runtime'],
-  reactHooks.configs.flat.recommended,
+  // customize eslint-plugin-react-hooks rules
   {
     rules: {
-      'react/self-closing-comp': ['error', { component: true, html: true }],
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
     },
   },
 

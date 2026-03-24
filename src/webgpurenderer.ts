@@ -2,7 +2,7 @@
 /// <reference path="../node_modules/@webgpu/types/dist/index.d.ts" />
 
 import Camera from './camera';
-import WebGPUComputePipline from './webgpucomputepipline';
+import WebGPUComputePipeline from './webgpucomputepipeline';
 import WebGPUMesh from './webgpumesh';
 import WebGPURenderContext from './webgpurendercontext';
 
@@ -31,7 +31,7 @@ export default class WebGPURenderer {
 
   private _options?: WebGPURendererOptions;
 
-  private _computePipeLine!: WebGPUComputePipline;
+  private _computePipeLine!: WebGPUComputePipeline;
 
   public constructor(canvas: HTMLCanvasElement, camera: Camera, settings?: WebGPURendererOptions) {
     this._canvas = canvas;
@@ -222,7 +222,7 @@ export default class WebGPURenderer {
     this._meshes.push(mesh);
   }
 
-  public setComputePipeLine(pipeline: WebGPUComputePipline): void {
+  public setComputePipeLine(pipeline: WebGPUComputePipeline): void {
     this._computePipeLine = pipeline;
   }
 }

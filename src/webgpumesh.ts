@@ -40,7 +40,7 @@ export default class WebGPUMesh extends WebGPUEntity {
       this._material.initalize(context);
     }
 
-    this._geometry.initalize(context);
+    this._geometry.initialize(context);
 
     const uboArray = new Float32Array([...this.modelMatrix]);
     this._uniformBuffer = createBuffer(context.device, uboArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);

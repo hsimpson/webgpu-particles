@@ -60,7 +60,7 @@ const Gui = (): React.ReactElement => {
         labelText={`Force: ${computePropertiesState.force.toFixed(2)}`}
       />
       <ChromePicker color={computePropertiesState.color} onChange={onColorChange} />
-      <button className="my-2 rounded bg-red-500 px-4 py-1 text-white hover:bg-red-700" onClick={onReset}>
+      <button type="button" className="my-2 rounded bg-red-500 px-4 py-1 text-white hover:bg-red-700" onClick={onReset}>
         Reset to default values
       </button>
       <div className="descriptionItem">

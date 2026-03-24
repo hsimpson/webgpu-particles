@@ -8,23 +8,23 @@ interface SliderProps {
   labelText?: string;
   onValueChange: (value: number) => void;
 }
-const Slider = (props: SliderProps): React.ReactElement => {
+const Slider = ({ min, max, step, value, labelText, onValueChange }: SliderProps): React.ReactElement => {
   const onSliderChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const value = parseFloat(event.target.value);
-    props.onValueChange(value);
+    const newValue = parseFloat(event.target.value);
+    onValueChange(newValue);
   };
   return (
     <div className="slider">
       <label>
-        {props.labelText ?? ''}
+        {labelText ?? ''}
         <br />
         <input
           className="w-full"
           type="range"
-          min={props.min}
-          max={props.max}
-          step={props.step}
-          value={props.value}
+          min={min}
+          max={max}
+          step={step}
+          value={value}
           onChange={onSliderChange}
         />
       </label>

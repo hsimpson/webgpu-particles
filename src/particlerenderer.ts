@@ -5,7 +5,7 @@ import { Vec2, vec2 } from 'wgpu-matrix';
 import { BoxDimensions, BoxGeometry } from './boxgeometry';
 import { CrossHairGeometry } from './crosshairgeometry';
 import ParticleGeometry from './particlegeometry';
-import WebGPUComputePipline from './webgpucomputepipline';
+import WebGPUComputePipeline from './webgpucomputepipeline';
 import WebGPUMaterial from './webgpumaterial';
 import WebGPUMesh from './webgpumesh';
 import WebGPURenderPipeline from './webgpurenderpipeline';
@@ -41,7 +41,7 @@ export default class ParticleRenderer {
 
   private readonly _movementSpeed = 0.25;
 
-  private _computePipeLine: WebGPUComputePipline;
+  private _computePipeLine: WebGPUComputePipeline;
   private _frameTimeCallback?: FrameCallBackT;
 
   private _particleMaterial: WebGPUMaterial;
@@ -62,7 +62,7 @@ export default class ParticleRenderer {
     const basicVertexShaderUrl = './assets/shaders/basic.vert.wgsl';
     const computeShaderUrl = './assets/shaders/particle.comp.wgsl';
     const particleVertexShaderUrl = './assets/shaders/particle.vert.wgsl';
-    const particleFragmenShaderUrl = './assets/shaders/particle.frag.wgsl';
+    const particleFragmentShaderUrl = './assets/shaders/particle.frag.wgsl';
 
     const boxPipeline = new WebGPURenderPipeline({
       primitiveTopology: 'line-list',
@@ -84,7 +84,7 @@ export default class ParticleRenderer {
       primitiveTopology: 'point-list',
       sampleCount: this._sampleCount,
       vertexShaderUrl: particleVertexShaderUrl,
-      fragmentShaderUrl: particleFragmenShaderUrl,
+      fragmentShaderUrl: particleFragmentShaderUrl,
     });
     particlePipeline.name = 'pointPipeline';
 
@@ -107,7 +107,7 @@ export default class ParticleRenderer {
     this._renderer.addMesh(this._particleMesh);
     /**/
 
-    this._computePipeLine = new WebGPUComputePipline(this._particleMesh, {
+    this._computePipeLine = new WebGPUComputePipeline(this._particleMesh, {
       computeShaderUrl,
       particleCount: particleCount,
     });
@@ -262,22 +262,22 @@ export default class ParticleRenderer {
     }
 
     const epsilon = 0.001;
-    const halfx = BoxDimensions[0] / 2 + epsilon;
-    const halfy = BoxDimensions[1] / 2 + epsilon;
-    const halfz = BoxDimensions[2] / 2 + epsilon;
+    const halfX = BoxDimensions[0] / 2 + epsilon;
+    const halfY = BoxDimensions[1] / 2 + epsilon;
+    const halfZ = BoxDimensions[2] / 2 + epsilon;
 
-    if (x < -halfx || x > halfx) {
+    if (x < -halfX || x > halfX) {
       x = this._crossHairMesh.position[0];
     }
-    if (y < -halfy || y > halfy) {
+    if (y < -halfY || y > halfY) {
       y = this._crossHairMesh.position[1];
     }
-    if (z < -halfz || z > halfz) {
+    if (z < -halfZ || z > halfZ) {
       z = this._crossHairMesh.position[2];
     }
 
     this._crossHairMesh.position = new Float32Array([x, y, z]);
-    this._computePipeLine.forcePostion = new Float32Array([x, y, z]);
+    this._computePipeLine.forcePosition = new Float32Array([x, y, z]);
   };
 
   private onKeyup = (event: KeyboardEvent): void => {
@@ -291,7 +291,7 @@ export default class ParticleRenderer {
     }
   };
 
-  public get computePipline(): WebGPUComputePipline {
+  public get computePipeline(): WebGPUComputePipeline {
     return this._computePipeLine;
   }
 

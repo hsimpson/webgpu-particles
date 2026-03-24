@@ -5,14 +5,14 @@ export interface StatsProps {
   cpuTime: number;
 }
 
-const Stats = (props: StatsProps): React.ReactElement => {
+const Stats = ({ frameTime, cpuTime }: StatsProps): React.ReactElement => {
   return (
     <div className="absolute top-0 left-0 p-2 text-red-400">
-      {`Avg frame time: ${props.frameTime.toFixed(3)} ms`}
+      {`Avg frame time: ${frameTime.toFixed(3)} ms`}
       <br />
-      {`FPS: ${(1000 / props.frameTime).toFixed(2)}`}
+      {`FPS: ${(1000 / frameTime).toFixed(2)}`}
       <br />
-      {`Avg CPU time: ${props.cpuTime.toFixed(3)} ms`}
+      {`Avg CPU time: ${cpuTime.toFixed(3)} ms`}
     </div>
   );
 };

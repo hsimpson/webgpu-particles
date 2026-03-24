@@ -17,7 +17,7 @@ export default abstract class WebGPUGeometryBase extends WebGPUObjectBase {
     this._initialized = false;
   }
 
-  public initalize(context: WebGPURenderContext): void {
+  public initialize(context: WebGPURenderContext): void {
     if (this._initialized) {
       return;
     }

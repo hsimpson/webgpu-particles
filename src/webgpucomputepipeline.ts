@@ -6,7 +6,7 @@ import WebGPUMesh from './webgpumesh';
 import WebGPUPipelineBase from './webgpupipelinebase';
 import WebGPURenderContext from './webgpurendercontext';
 
-interface WebGPUComputePiplineOptions {
+interface WebGPUComputePipelineOptions {
   computeShaderUrl: string;
   particleCount: number;
 }
@@ -20,8 +20,8 @@ interface ComputeParams {
   fForceOn: number;
 }
 
-export default class WebGPUComputePipline extends WebGPUPipelineBase {
-  private _options: WebGPUComputePiplineOptions;
+export default class WebGPUComputePipeline extends WebGPUPipelineBase {
+  private _options: WebGPUComputePipelineOptions;
   private _bindGroupLayout!: GPUBindGroupLayout;
   private _bindGroup!: GPUBindGroup;
 
@@ -36,7 +36,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
 
   private _context!: WebGPURenderContext;
 
-  public constructor(drawMesh: WebGPUMesh, options: WebGPUComputePiplineOptions) {
+  public constructor(drawMesh: WebGPUMesh, options: WebGPUComputePipelineOptions) {
     super();
 
     this._drawMesh = drawMesh;
@@ -210,7 +210,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
       this._options.particleCount = count;
 
       this._drawMesh.geometry = new ParticleGeometry(this._options.particleCount, 4);
-      this._drawMesh.geometry.initalize(this._context);
+      this._drawMesh.geometry.initialize(this._context);
       this._initialized = false;
       await this.initialize(this._context);
     }
@@ -233,7 +233,7 @@ export default class WebGPUComputePipline extends WebGPUPipelineBase {
     this.updateUniformBuffer();
   }
 
-  public set forcePostion(pos: Vec3) {
+  public set forcePosition(pos: Vec3) {
     this._computeParams.vForcePos = new Float32Array([pos[0], pos[1], pos[2], 1.0]);
     this.updateUniformBuffer();
   }
