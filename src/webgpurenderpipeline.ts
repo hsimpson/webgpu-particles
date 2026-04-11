@@ -28,7 +28,7 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     this._options = { ...defaultOptions, ...options };
   }
 
-  public async initalize(
+  public async initialize(
     context: WebGPURenderContext,
     vertexBufferLayouts: GPUVertexBufferLayout[],
     bindGroupLayoutEntries: GPUBindGroupLayoutEntry[],
@@ -118,9 +118,9 @@ export default class WebGPURenderPipeline extends WebGPUPipelineBase {
     this._pipeline = context.device.createRenderPipeline(pipelineDesc);
   }
 
-  public get gpuPipeline(): GPURenderPipeline {
-    return this._pipeline as GPURenderPipeline;
-  }
+  // public get gpuPipeline(): GPURenderPipeline {
+  //   return this._pipeline as GPURenderPipeline;
+  // }
 
   public get bindGroup(): GPUBindGroup {
     return this._bindGroup;

@@ -1,18 +1,31 @@
 {
   "compilerOptions": {
-    "downlevelIteration": true,
+    "allowJs": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "erasableSyntaxOnly": false,
     "esModuleInterop": true,
+    "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "lib": ["DOM", "ESNext"],
     "module": "esnext",
     "moduleResolution": "bundler",
+    "noErrorTruncation": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    // "noUncheckedIndexedAccess": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "dist",
+    "paths": {},
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "ES2024",
-    "typeRoots": ["./src/@types", "./node_modules/@webgpu/types", "node_modules/@types"]
+    "target": "es2025",
+    "types": ["node", "@webgpu/types"]
   }
 }

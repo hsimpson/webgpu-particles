@@ -29,7 +29,7 @@ export default class WebGPUMesh extends WebGPUEntity {
     this._material = material;
   }
 
-  public async initalize(context: WebGPURenderContext, camera: Camera): Promise<void> {
+  public async initialize(context: WebGPURenderContext, camera: Camera): Promise<void> {
     if (this._initialized) {
       return;
     }
@@ -37,7 +37,7 @@ export default class WebGPUMesh extends WebGPUEntity {
     this._context = context;
 
     if (this._material) {
-      this._material.initalize(context);
+      this._material.initialize(context);
     }
 
     this._geometry.initialize(context);
@@ -82,7 +82,7 @@ export default class WebGPUMesh extends WebGPUEntity {
       bindGroupEntries.push(...this._material.bindGroupEntries);
     }
 
-    await this._pipeline.initalize(
+    await this._pipeline.initialize(
       context,
       this._geometry.vertexBufferLayouts,
       bindGroupLayoutEntries,
@@ -97,7 +97,7 @@ export default class WebGPUMesh extends WebGPUEntity {
     }
   }
 
-  protected updateModelMatrix(): void {
+  protected override updateModelMatrix(): void {
     super.updateModelMatrix();
     this.updateUniformBuffer();
   }
@@ -115,7 +115,7 @@ export default class WebGPUMesh extends WebGPUEntity {
   }
 
   public get gpuPipeline(): GPURenderPipeline {
-    return this._pipeline.gpuPipeline;
+    return this._pipeline.gpuPipeline as GPURenderPipeline;
   }
 
   public get material(): WebGPUMaterial | undefined {

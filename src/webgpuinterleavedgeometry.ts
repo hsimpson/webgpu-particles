@@ -22,7 +22,7 @@ export default class WebGPUInterleavedGeometry extends WebGPUGeometryBase {
     this._attributes.push(attribute);
   }
 
-  public initialize(context: WebGPURenderContext): void {
+  public override initialize(context: WebGPURenderContext): void {
     super.initialize(context);
     if (this._initialized) {
       return;

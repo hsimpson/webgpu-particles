@@ -194,9 +194,9 @@ export default class WebGPUComputePipeline extends WebGPUPipelineBase {
     return this._bindGroup;
   }
 
-  public get gpuPipeline(): GPUComputePipeline {
-    return this._pipeline as GPUComputePipeline;
-  }
+  // public get gpuPipeline(): GPUComputePipeline {
+  //   return this._pipeline as GPUComputePipeline;
+  // }
 
   public get particleCount(): number {
     return this._options.particleCount;

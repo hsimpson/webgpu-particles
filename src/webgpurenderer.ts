@@ -118,7 +118,7 @@ export default class WebGPURenderer {
 
     const meshInitializers: Promise<void>[] = [];
     for (const mesh of this._meshes) {
-      meshInitializers.push(mesh.initalize(this._context, this._camera));
+      meshInitializers.push(mesh.initialize(this._context, this._camera));
     }
 
     await Promise.all(meshInitializers);
@@ -131,7 +131,7 @@ export default class WebGPURenderer {
 
     this._computePipeLine.deltaTime(deltaTime);
     const passEncoder = commandEncoder.beginComputePass();
-    passEncoder.setPipeline(this._computePipeLine.gpuPipeline);
+    passEncoder.setPipeline(this._computePipeLine.gpuPipeline as GPUComputePipeline);
     passEncoder.setBindGroup(0, this._computePipeLine.bindGroup);
     // passEncoder.dispatch(this._computePipeLine.particleCount, 1, 1);
     passEncoder.dispatchWorkgroups(Math.ceil(this._computePipeLine.particleCount / 256));
@@ -142,7 +142,7 @@ export default class WebGPURenderer {
 
   private renderPass(): void {
     if (!this._presentationContext) {
-      throw new Error('No resentationContext given');
+      throw new Error('No presentationContext given');
     }
     const colorAttachment: GPURenderPassColorAttachment = {
       view: this._presentationContext.getCurrentTexture().createView(),

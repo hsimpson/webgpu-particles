@@ -16,7 +16,7 @@ export default class WebGPUMaterial {
     this._color = color;
   }
 
-  public initalize(context: WebGPURenderContext): void {
+  public initialize(context: WebGPURenderContext): void {
     if (this._initialized) {
       return;
     }
