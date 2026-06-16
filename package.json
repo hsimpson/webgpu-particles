@@ -44,7 +44,7 @@
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.1",
-    "vite": "^8.0.8"
+    "vite": "^8.0.16"
   },
   "dependencies": {
     "jotai": "^2.19.1",
